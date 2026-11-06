@@ -1,0 +1,103 @@
+\documentclass[border=6pt]{standalone}
+% NOTE: the `tikz` class option is deliberately NOT used: with it, standalone
+% falls back to a full letter page for circuitikz pictures (Overfull \hbox at
+% \end{circuitikz}) instead of cropping to the drawing.  Plain border=6pt crops
+% tightly around the drawing, as in the target.
+\usepackage[european]{circuitikz}
+\usetikzlibrary{arrows.meta}   % solid triangular head for the current arrow
+% The target uses american symbols: a zigzag resistor and a four-bump coil,
+% even though the package is loaded with the european option.
+% A bump of the american coil is (bipoles/americaninductor/coil height) *
+% (bipoles/length) tall: 0.15*1.4cm = 0.21cm by default, which reads flat next
+% to the 0.42cm R_f zigzag.  Raising it to .21 gives ~0.29cm, matching the
+% target's four-loop coil, which is comparable in height to the resistor.
+\ctikzset{resistor=american, inductor=american}
+\ctikzset{bipoles/americaninductor/coil height=0.21}
+
+\begin{document}
+\begin{circuitikz}
+
+  % ==================================================================
+  % Geometry (all in cm).  Drawing spans x = 0 .. 12.1 and y = -0.95 .. 3.3,
+  % i.e. 12.1 x 4.25 (aspect 2.85; rendered page aspect ~2.68, target ~2.70).
+  %
+  %   lower (return) wire  y = 0
+  %   upper (loop) wire    y = 2.2      -> the two wires are 2.2 cm apart
+  %   top dashed border    y = 3.3      -> 1.1 cm headroom above the upper wire
+  %   bottom dashed border y = -0.95    -> 0.95 cm below the return wire
+  %
+  % Horizontal distribution as fractions of the 12.1 cm width
+  % (target values in brackets):
+  %   converter block  0.041-0.248  [0.043-0.255]
+  %   L_f              0.322-0.430  [0.324-0.433]
+  %   R_f              0.467-0.545  [0.468-0.548]
+  %   current arrow    0.574-0.620  [0.577-0.623]
+  %   port marks +/v/- 0.628        [0.629]
+  %   group divider    0.690-0.698  [~0.700]  (crosses bare wire only)
+  %   Z_g              0.769-0.855  [0.770-0.860] (wholly inside the grid box)
+  %   source / right wire 0.921     [0.924]
+  % All component labels share one row at y = 2.85 (0.65 cm above the wire),
+  % which leaves ~0.2 cm to the top border and ~0.1 cm to the coil tops.
+  % ==================================================================
+
+  % --- converter AC-side terminals (on the block's right edge) --------
+  \coordinate (cTR) at (3.0,2.2);    % upper wire leaves the right edge
+  \coordinate (cBR) at (3.0,0);      % lower wire leaves the bottom-right corner
+
+  % --- filter and grid element ends -----------------------------------
+  \coordinate (l1) at (3.9,2.2);     % L_f left end
+  \coordinate (l2) at (5.2,2.2);     % L_f right end
+  \coordinate (r1) at (5.65,2.2);    % R_f left end
+  \coordinate (r2) at (6.6,2.2);     % R_f right end
+  \coordinate (z1) at (9.3,2.2);     % Z_g left end  (inside the grid box)
+  \coordinate (z2) at (10.35,2.2);   % Z_g right end (inside the grid box)
+  \coordinate (gN) at (11.15,2.2);   % grid side, upper corner
+  \coordinate (vT) at (11.15,1.5);   % v_g upper terminal
+  \coordinate (vB) at (11.15,0.4);   % v_g lower terminal
+  \coordinate (gS) at (11.15,0);     % grid side, lower corner
+
+  % --- series loop: converter -> L_f -> R_f -> Z_g -> v_g -> converter -
+  % Long bare run from the port marks to Z_g, short run from Z_g to the
+  % source, exactly as in the target.  Component labels are placed
+  % separately below so that they all sit on one row.
+  \draw (cTR) -- (l1) to[L] (l2)
+               -- (r1) to[R] (r2)
+               -- (z1) to[generic] (z2)
+               -- (gN) -- (vT)
+               to[sV] (vB)
+               -- (gS) -- (cBR);
+
+  % --- DC/AC converter block (plain TikZ: no circuitikz component) ----
+  % Square 2.5 x 2.5, ~45 degree diagonal; bottom edge on the return wire,
+  % top edge 0.3 cm above the upper wire.
+  \draw (0.5,0) rectangle (3.0,2.5);
+  \draw (0.5,0) -- (3.0,2.5);        % DC-to-AC diagonal, bottom-left -> top-right
+  \node at (1.2,1.93) {DC};          % upper-left side of the diagonal
+  \node at (2.35,0.35) {AC};         % lower-right side, near the bottom-right corner
+
+  % --- dashed group boxes with their captions ------------------------
+  % 0.1 cm gap between the GFM and grid boxes at the divider x = 8.35-8.45;
+  % the divider crosses bare wire only (Z_g starts at x = 9.3).
+  \draw[dashed] (0.0,-0.95) rectangle (8.35,3.3);   % GFM converter group
+  \draw[dashed] (8.45,-0.95) rectangle (12.1,3.3);  % grid group
+  \node at (5.0,-0.6)    {GFM converter};           % 0.41 of the width (target 0.42)
+  \node at (10.275,-0.6) {grid};                    % 0.85 of the width (target 0.85)
+
+  % --- component labels: one common row, clear of border and divider --
+  \node at (4.55,2.85)  {$L_f$};     % over the coil
+  \node at (6.125,2.85) {$R_f$};     % over the zigzag
+  \node at (9.825,2.85) {$Z_g$};     % over the grid impedance, same row
+
+  % --- annotations ---------------------------------------------------
+  % current arrow on the upper wire, pointing to the grid side
+  \draw[-{Triangle[length=6pt,width=5pt]}] (6.95,2.2) -- (7.5,2.2);
+  \node at (7.22,2.85) {$i$};
+  % port voltage v: v, + and - share one x, well inside the GFM box
+  \node at (7.6,1.9) {$+$};          % just under the upper wire
+  \node at (7.6,1.1) {$v$};          % midway between the two wires
+  \node at (7.6,0.3) {$-$};          % just above the lower wire
+  % grid voltage source label, level with the circle centre, to its left
+  \node[anchor=east] at (10.72,0.95) {$v_g$};
+
+\end{circuitikz}
+\end{document}

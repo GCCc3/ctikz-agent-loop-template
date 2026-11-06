@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "efficiency-report.schema.json",
+  "title": "Efficiency analysis report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "scope",
+    "summary",
+    "patterns",
+    "toolProposals",
+    "nonToolRecommendations",
+    "rejectedPatterns",
+    "openQuestions",
+    "blocker"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["complete", "partial", "blocked"]
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["iterationsReviewed", "artifactsInspected"],
+      "properties": {
+        "iterationsReviewed": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "artifactsInspected": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "summary": { "type": "string" },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "occurrences", "generalization", "confidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["iteration", "agent", "evidence"],
+              "properties": {
+                "iteration": { "type": "integer", "minimum": 1 },
+                "agent": { "type": "string" },
+                "evidence": { "type": "string" }
+              }
+            }
+          },
+          "generalization": { "type": "string" },
+          "confidence": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        }
+      }
+    },
+    "toolProposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "purpose",
+          "description",
+          "inputs",
+          "outputs",
+          "patternIds",
+          "expectedSavings",
+          "risks",
+          "confidence"
+        ],
+        "properties": {
+          "name": { "type": "string" },
+          "purpose": { "type": "string" },
+          "description": { "type": "string" },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "type", "required", "description"],
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string" },
+                "required": { "type": "boolean" },
+                "description": { "type": "string" }
+              }
+            }
+          },
+          "outputs": { "type": "string" },
+          "patternIds": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "expectedSavings": { "type": "string" },
+          "risks": { "type": "string" },
+          "confidence": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        }
+      }
+    },
+    "nonToolRecommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "rationale", "expectedSavings"],
+        "properties": {
+          "description": { "type": "string" },
+          "rationale": { "type": "string" },
+          "expectedSavings": { "type": "string" }
+        }
+      }
+    },
+    "rejectedPatterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "reason"],
+        "properties": {
+          "description": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "openQuestions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "blocker": {
+      "type": ["string", "null"]
+    }
+  }
+}

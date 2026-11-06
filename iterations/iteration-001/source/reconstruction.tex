@@ -1,0 +1,65 @@
+\documentclass[tikz,border=6pt]{standalone}
+\usepackage[european]{circuitikz}
+% The target uses an american (zigzag) resistor and a bumpy inductor even though
+% the package is loaded with the "european" option, so those two shapes are
+% switched back to their american/cute variants.
+\ctikzset{resistor=american, inductor=cute}
+
+\begin{document}
+\begin{circuitikz}
+
+  % ------------------------------------------------------------------
+  % Geometry: the converter square is 3 x 3 drawn in cm.
+  % Upper wire at y=3, lower (return) wire at y=0.
+  % Series loop:    converter A -> L_f -> R_f -> Z_g -> v_g -> converter B
+  % ------------------------------------------------------------------
+
+  % --- terminals of the converter block ------------------------------
+  \coordinate (tA) at (3,3);      % AC-side upper terminal (top-right corner)
+  \coordinate (tB) at (3,0);      % AC-side lower terminal (bottom-right corner)
+
+  % --- filter and grid element ends ----------------------------------
+  \coordinate (l1) at (3.9,3);    % L_f left end
+  \coordinate (l2) at (4.9,3);    % L_f right end
+  \coordinate (r1) at (5.6,3);    % R_f left end
+  \coordinate (r2) at (6.6,3);    % R_f right end
+  \coordinate (z1) at (10.2,3);   % Z_g left end
+  \coordinate (z2) at (11.3,3);   % Z_g right end
+  \coordinate (gN) at (12,3);     % grid side, upper corner
+  \coordinate (vT) at (12,2);     % v_g upper terminal
+  \coordinate (vB) at (12,1);     % v_g lower terminal
+  \coordinate (gS) at (12,0);     % grid side, lower corner
+
+  % --- series loop: L_f, R_f, Z_g and v_g in one connected path ------
+  \draw (tA) -- (l1) to[L, l=$L_f$] (l2)
+             -- (r1) to[R, l=$R_f$] (r2)
+             -- (z1) to[generic, l=$Z_g$] (z2)
+             -- (gN) -- (vT)
+             to[sV] (vB)
+             -- (gS) -- (tB);
+
+  % --- DC/AC converter block (plain TikZ: no circuitikz component) ---
+  \draw (0,0) rectangle (3,3);
+  \draw (0,0) -- (3,3);           % DC-to-AC diagonal, bottom-left to top-right
+  \node at (0.85,2.25) {DC};      % upper-left side of the diagonal
+  \node at (1.95,0.75) {AC};      % lower-right side of the diagonal
+
+  % --- dashed group boxes with their captions ------------------------
+  \draw[dashed] (-0.6,-1.0) rectangle (7.85,3.95);   % GFM converter group
+  \draw[dashed] (8.15,-1.0) rectangle (13.3,3.95);   % grid group
+  \node at (5.2,-0.5) {GFM converter};
+  \node at (10.9,-0.5) {grid};
+
+  % --- annotations ---------------------------------------------------
+  % current arrow drawn on the upper wire, pointing to the grid side
+  \draw[->, >=Stealth] (7.35,3) -- (7.72,3);
+  \node at (7.5,3.3) {$i$};
+  % voltage v across the port with its polarity marks
+  \node at (7.45,1.6) {$v$};
+  \node at (8.35,2.45) {$+$};
+  \node at (8.35,0.55) {$-$};
+  % grid voltage source label, immediately left of the source
+  \node[anchor=east] at (11.45,1.5) {$v_g$};
+
+\end{circuitikz}
+\end{document}

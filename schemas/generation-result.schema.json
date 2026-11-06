@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "generation-result.schema.json",
+  "title": "Generation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "summary",
+    "changes",
+    "blocker"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "generated",
+        "blocked",
+        "failed"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "filename",
+          "reason",
+          "addedCode"
+        ],
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "addedCode": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "blocker": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

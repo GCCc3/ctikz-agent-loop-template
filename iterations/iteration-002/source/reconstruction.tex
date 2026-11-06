@@ -1,0 +1,83 @@
+\documentclass[border=6pt]{standalone}
+% NOTE: the tikz class option is deliberately NOT used: with it, standalone
+% falls back to a full letter page for circuitikz pictures (Overfull \hbox at
+% \end{circuitikz}) instead of cropping to the drawing.  Plain border=6pt crops.
+\usepackage[european]{circuitikz}
+% The target uses an american (zigzag) resistor and a bumpy inductor even though
+% the package is loaded with the european option, so those two shapes are
+% switched back to their american/cute variants.
+\ctikzset{resistor=american, inductor=cute}
+
+\begin{document}
+\begin{circuitikz}
+
+  % ------------------------------------------------------------------
+  % Geometry (all in cm).  Drawing spans x = 0 .. 12.1 and y = -0.75 .. 3.65,
+  % i.e. the dashed boxes reach the page border and the sheet aspect
+  % (12.1/4.4 = 2.75) matches the target's ~2.7-2.9.
+  %
+  % Upper wire at y=3, lower (return) wire at y=0.
+  % Series loop: converter AC side -> L_f -> R_f -> Z_g -> v_g -> converter.
+  %
+  % Horizontal distribution, as fractions of the 12.1 cm drawing width:
+  %   converter 0.04-0.25 | L_f 0.29-0.38 | R_f 0.42-0.48 |
+  %   current arrow 0.55-0.59 | port marks v,+,- 0.62 |
+  %   Z_g 0.67-0.74 (straddles the divider) | divider 0.69-0.70 |
+  %   source 0.92 | right edge 1.00
+  % Group split: GFM box 0.00-0.69, grid box 0.70-1.00 (0.1 cm gap).
+  % ------------------------------------------------------------------
+
+  % --- terminals of the converter block ------------------------------
+  \coordinate (cTR) at (3.0,3);    % AC-side upper terminal (top-right corner)
+  \coordinate (cBR) at (3.0,0);    % AC-side lower terminal (bottom-right corner)
+
+  % --- filter and grid element ends ----------------------------------
+  \coordinate (l1) at (3.5,3);     % L_f left end
+  \coordinate (l2) at (4.6,3);     % L_f right end
+  \coordinate (r1) at (5.05,3);    % R_f left end
+  \coordinate (r2) at (5.8,3);     % R_f right end
+  \coordinate (z1) at (8.05,3);    % Z_g left end  (left of the group divider)
+  \coordinate (z2) at (9.0,3);     % Z_g right end (right of the group divider)
+  \coordinate (gN) at (11.1,3);    % grid side, upper corner
+  \coordinate (vT) at (11.1,2);    % v_g upper terminal
+  \coordinate (vB) at (11.1,1);    % v_g lower terminal
+  \coordinate (gS) at (11.1,0);    % grid side, lower corner
+
+  % --- series loop: L_f, R_f, Z_g and v_g in one connected path ------
+  % Short bare run from the current arrow to Z_g; long run from Z_g to v_g.
+  \draw (cTR) -- (l1) to[L, l=$L_f$] (l2)
+               -- (r1) to[R, l=$R_f$] (r2)
+               -- (z1) to[generic, l=$Z_g$] (z2)
+               -- (gN) -- (vT)
+               to[sV] (vB)
+               -- (gS) -- (cBR);
+
+  % --- DC/AC converter block (plain TikZ: no circuitikz component) ---
+  % Portrait rectangle 2.5 wide x 3 tall; top and bottom edges lie on the wires.
+  \draw (0.5,0) rectangle (3.0,3);
+  \draw (0.5,0) -- (3.0,3);        % DC-to-AC diagonal, bottom-left to top-right
+  \node at (1.2,2.3) {DC};         % upper-left side of the diagonal
+  \node at (2.35,0.4) {AC};        % lower-right side, near the bottom-right corner
+
+  % --- dashed group boxes with their captions ------------------------
+  % Tight margins: 0.65 above the upper wire, 0.75 below the lower wire,
+  % and a 0.1 cm gap between the GFM and grid boxes at the divider
+  % x = 8.35-8.45 (the Z_g body 8.05-9.00 straddles that divider).
+  \draw[dashed] (0.0,-0.75) rectangle (8.35,3.65);   % GFM converter group
+  \draw[dashed] (8.45,-0.75) rectangle (12.1,3.65);  % grid group
+  \node at (4.175,-0.38) {GFM converter};            % centred under its box
+  \node at (10.275,-0.38) {grid};                    % centred under its box
+
+  % --- annotations ---------------------------------------------------
+  % current arrow drawn on the upper wire, pointing to the grid side
+  \draw[->, >=Stealth] (6.6,3) -- (7.1,3);
+  \node at (6.85,3.3) {$i$};
+  % port voltage v: v, + and - share one x, well inside the GFM box
+  \node at (7.5,2.7)  {$+$};       % just under the upper wire
+  \node at (7.5,1.5)  {$v$};       % midway between the two wires
+  \node at (7.5,0.3)  {$-$};       % just above the lower wire
+  % grid voltage source label, at the upper left of the source circle
+  \node[anchor=east] at (10.65,1.75) {$v_g$};
+
+\end{circuitikz}
+\end{document}

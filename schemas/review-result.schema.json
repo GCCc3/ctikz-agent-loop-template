@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review-result.schema.json",
+  "title": "Review result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision",
+    "summary",
+    "findings",
+    "nextActions",
+    "humanQuestion"
+  ],
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": [
+        "accept",
+        "revise",
+        "human-review",
+        "blocked"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "severity",
+          "description",
+          "evidence"
+        ],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "major",
+              "minor"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nextActions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "humanQuestion": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

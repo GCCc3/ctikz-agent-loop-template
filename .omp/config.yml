@@ -1,0 +1,42 @@
+# Project-level omp configuration.
+# Concrete provider/model selectors are installation-specific. The subagents
+# inherit the parent model unless the optional role mappings below are enabled.
+#
+# modelRoles:
+#    generator: provider/generator-model
+#    reviewer: provider/reviewer-model
+
+task:
+  maxConcurrency: 2
+  maxRecursionDepth: 1
+  softRequestBudget: 80
+  maxRuntimeMs: 900000
+  agentIdleTtlMs: 120000
+
+tools:
+  approvalMode: write
+  approval:
+    browser: deny
+    computer: deny
+    eval: deny
+
+bash:
+  patterns:
+    - match: "scripts/init-current.sh"
+      approval: allow
+    - match: "scripts/check-workspace.sh"
+      approval: allow
+    - match: "scripts/render.sh"
+      approval: allow
+    - match: "scripts/validate.sh"
+      approval: allow
+    - match: "scripts/persist-result.sh *"
+      approval: allow
+    - match: "scripts/archive-iteration.sh"
+      approval: allow
+    - match: "scripts/next-iteration-number.sh"
+      approval: allow
+    - match: "scripts/render-efficiency-report.py *"
+      approval: allow
+    - match: "rm -rf *"
+      approval: deny

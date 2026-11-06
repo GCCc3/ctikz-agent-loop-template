@@ -1,0 +1,42 @@
+{
+  "status": "passed",
+  "renderingStatus": "passed",
+  "sourceArtifact": "current/reconstruction.tex",
+  "renderedArtifacts": [
+    "current/reconstruction.pdf",
+    "current/reconstruction.png"
+  ],
+  "checks": [
+    {
+      "name": "source-exists",
+      "status": "passed",
+      "message": "The reconstruction source exists and is non-empty."
+    },
+    {
+      "name": "circuitikz-package",
+      "status": "passed",
+      "message": "The source loads CircuitTikZ."
+    },
+    {
+      "name": "circuitikz-environment",
+      "status": "passed",
+      "message": "The source contains a circuitikz environment."
+    },
+    {
+      "name": "target-not-embedded",
+      "status": "passed",
+      "message": "The source does not reference the target raster."
+    },
+    {
+      "name": "pdf-exists",
+      "status": "passed",
+      "message": "The rendered PDF exists and is non-empty."
+    },
+    {
+      "name": "png-exists",
+      "status": "passed",
+      "message": "The rendered PNG exists and is non-empty."
+    }
+  ],
+  "failureSummary": null
+}

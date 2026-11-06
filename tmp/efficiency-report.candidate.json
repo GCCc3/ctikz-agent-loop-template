@@ -1,0 +1,541 @@
+{
+  "status": "complete",
+  "scope": {
+    "iterationsReviewed": [
+      1,
+      2,
+      3
+    ],
+    "artifactsInspected": [
+      "workflow/efficiency-analysis.md",
+      "workflow/objective.md",
+      "workflow/completion-criteria.md",
+      "workflow/coordinator.md",
+      "workflow/generator-instructions.md",
+      "workflow/reviewer-instructions.md",
+      "workflow/current-human-feedback.md",
+      "reference/domain-rules.md",
+      "reference/README.md",
+      "reference/target.png",
+      "iterations/iteration-001/transcripts/generator/01-GenIteration1.md",
+      "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md",
+      "iterations/iteration-001/results/generation-result.json",
+      "iterations/iteration-001/results/review-result.json",
+      "iterations/iteration-001/results/validation-result.json",
+      "iterations/iteration-001/manifest.json",
+      "iterations/iteration-001/logs/render.stdout.log",
+      "iterations/iteration-002/transcripts/generator/01-GenIteration2.md",
+      "iterations/iteration-002/transcripts/generator/02-GenIteration2b.md",
+      "iterations/iteration-002/transcripts/generator/03-GenIteration2Gen.md",
+      "iterations/iteration-002/transcripts/reviewer/01-RevIteration2.md",
+      "iterations/iteration-002/results/generation-result.json",
+      "iterations/iteration-002/results/review-result.json",
+      "iterations/iteration-002/results/validation-result.json",
+      "iterations/iteration-002/manifest.json",
+      "iterations/iteration-003/transcripts/generator/01-GenIteration3.md",
+      "iterations/iteration-003/transcripts/reviewer/01-RevIteration3.md",
+      "iterations/iteration-003/results/generation-result.json",
+      "iterations/iteration-003/results/review-result.json",
+      "iterations/iteration-003/results/validation-result.json",
+      "iterations/iteration-003/manifest.json",
+      "current/reconstruction.tex",
+      "current/reconstruction.png",
+      "current/reconstruction.pdf",
+      "current/validation-result.json",
+      "current/review-result.json",
+      "schemas/efficiency-report.schema.json",
+      "schemas/generation-result.schema.json",
+      "schemas/review-result.schema.json",
+      "schemas/validation-result.schema.json",
+      "schemas/iteration-manifest.schema.json",
+      "scripts/validate.sh",
+      "scripts/render.sh",
+      "scripts/persist-result.sh",
+      "scripts/archive-iteration.sh",
+      "scripts/check-workspace.sh",
+      "scripts/next-iteration-number.sh",
+      "scripts/init-current.sh",
+      "scripts/run.sh",
+      "scripts/render-efficiency-report.py",
+      "scripts/lib/validate_json_schema.py",
+      ".omp/agents/diagram-generator.md",
+      ".omp/agents/diagram-reviewer.md",
+      ".omp/agents/efficiency.md",
+      ".omp/config.yml",
+      "README.md"
+    ]
+  },
+  "summary": "Highest-leverage: target geometry is re-measured by eye on every pass and the measurements are not stable. Iteration 1 told the Generator that Z_g must straddle the GFM/grid divider and that the converter block must be a 2.5x3 portrait; iteration 2 implemented both; iteration 2's Reviewer then re-measured the same target regions and found the opposite (Z_g wholly inside the grid box, block essentially square), so iteration 3 reversed both. That is one wasted generation pass caused by ad hoc measurement, on top of roughly 60-70 manually transcribed pixel/fraction values across the three reviews, two to three target reads per review, a five-call/~200-line hand-rolled PNG decoder in iteration 2b, and a ten-call standalone/preview investigation just to explain one uncropped page. `measure_diagram_geometry` would return page/ink bboxes, per-element fractions for target/render/source, tight-crop status and baseline deltas in one call, and would give the Bash-less Generator/Reviewer deterministic measurement without loosening `eval: deny`. Second: CircuitTikZ package-source rediscovery (19 calls and 1,000+ lines in iteration 1; 11 calls and ~1,900 lines in iteration 3) should be `lookup_circuitikz_component`. Third: the static source checklist (one circuitikz environment, no `tikz` class option, twelve-label inventory, no image inclusion) is re-checked by every pass and should be `lint_reconstruction_tex`; the iteration-1 crop defect is exactly the error class it would catch before render. All eight transcripts and every archived result and manifest were read; no evidence gaps.",
+  "patterns": [
+    {
+      "id": "P1",
+      "description": "Every review pass re-opens reference/target.png and current/reconstruction.png and manually extracts pixel bounding boxes or centres for the same diagram elements, then restates them in findings.",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md reads `reference/target.png` twice and measures the target: `+ at ~(472,95), v at ~(470,140), - at ~(470,205)` and `reference/target.png is ~770x285 px (aspect ~2.7)`."
+        },
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md measures the bad render: `current/reconstruction.png measures 1530x1980 px = 8.5x11 in at the 180 dpi used by scripts/render.sh (aspect 0.77)`."
+        },
+        {
+          "iteration": 2,
+          "agent": "RevIteration2",
+          "evidence": "iterations/iteration-002/transcripts/reviewer/01-RevIteration2.md reads `current/reconstruction.png` three times and writes `Fractions of drawing width, target -> recon: L_f 0.324-0.433 -> 0.289-0.380; R_f 0.468-0.548 -> 0.417-0.479`."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2b",
+          "evidence": "iterations/iteration-002/transcripts/generator/02-GenIteration2b.md runs five `bash(python3 - <<'EOF' ... zlib,struct ...` calls to decode `reference/target.png`, then states `Now I have exact pixel geometry of the target`."
+        },
+        {
+          "iteration": 3,
+          "agent": "RevIteration3",
+          "evidence": "iterations/iteration-003/transcripts/reviewer/01-RevIteration3.md measures `the block spans approximately x 50-240 px and y 72-232 px against a drawing of approximately 806 px width (12.1 cm, 66.6 px/cm)` after reading target and render twice each."
+        }
+      ],
+      "generalization": "The same two images and the same element set are measured every time (converter block, L_f, R_f, i arrow, +/v/-, divider, Z_g, v_g, captions, dashed boxes). What varies is which element is under challenge; the recipe (ink bbox in px, then fraction of drawing width or height) is identical.",
+      "confidence": "high"
+    },
+    {
+      "id": "P2",
+      "description": "Agents re-derive normalized coordinate fractions from explicit centimetre coordinates in the .tex and from the target's pixel table by hand, in generation summaries and review evidence alike.",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md: `Normalised element positions (fraction of drawing width) confirm the offset: L_f 0.29-0.38 target vs 0.32-0.40 recon, ... divider 0.70 vs 0.62, Z_g 0.67-0.75 vs 0.78-0.86`."
+        },
+        {
+          "iteration": 1,
+          "agent": "GenIteration1",
+          "evidence": "iterations/iteration-001/transcripts/generator/01-GenIteration1.md: `boxes -0.6..7.85 and 8.15..13.3 wide by -1.0..3.95 high, giving the target's ~2.8:1 aspect`."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2",
+          "evidence": "iterations/iteration-002/transcripts/generator/01-GenIteration2.md: `converter 0.04-0.25, L_f 0.29-0.38, R_f 0.42-0.48, arrow 0.55-0.59, divider 0.70, Z_g 0.67-0.75 ... source 0.92, right edge 1.00` on a 12 cm drawing width."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2Gen",
+          "evidence": "iterations/iteration-002/transcripts/generator/03-GenIteration2Gen.md: `AC moved to (2.35,0.4) so it sits at 74% across / 87% down the 2.5x3 portrait converter block`."
+        },
+        {
+          "iteration": 3,
+          "agent": "GenIteration3",
+          "evidence": "iterations/iteration-003/transcripts/generator/01-GenIteration3.md: `Z_g ... 0.769-0.855 of the 12.1 cm width ... port marks (7.6) -> Z_g = 1.7 cm and Z_g -> source (11.15) = 0.8 cm`."
+        },
+        {
+          "iteration": 3,
+          "agent": "RevIteration3",
+          "evidence": "iterations/iteration-003/transcripts/reviewer/01-RevIteration3.md: ``(0.5,0) rectangle (3.0,2.5)` = 0.207 W x 0.588 H`."
+        }
+      ],
+      "generalization": "The arithmetic is always `(x - drawing_x0) / drawing_width` and `(y - drawing_y0) / drawing_height`, plus run lengths between consecutive element endpoints. What varies is the element list and the drawing width (13.9 cm in iteration 1, 12 cm in iteration 2, 12.1 cm in iteration 3).",
+      "confidence": "high"
+    },
+    {
+      "id": "P3",
+      "description": "Generators read the installed CircuitTikZ package sources to re-answer the same symbol and style questions instead of resolving them from a stable index.",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "GenIteration1",
+          "evidence": "iterations/iteration-001/transcripts/generator/01-GenIteration1.md: glob/grep/read of `circuitikz.sty` and `pgfcircbipoles.tex`, including two `Path not found` errors, then `glob(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/*)`; conclusion `v1.8.4 confirmed: generic, sV, L, R, resistor=american, inductor=cute`."
+        },
+        {
+          "iteration": 3,
+          "agent": "GenIteration3",
+          "evidence": "iterations/iteration-003/transcripts/generator/01-GenIteration3.md reads `pgfcircbipoles.tex` (full plus ranges 600-800, 1150-1350, 1354-1560, 1564-1760), `pgfcirc.defines.tex`, `pgfcircvoltage.tex`, `pgfcircshapes.tex`, and `pgfcircutils.tex`; conclusion `verified against the installed circuitikz source: bipoles/length=1.4cm, americaninductor/coil height default .15`."
+        }
+      ],
+      "generalization": "The TeX Live installation is fixed and the questions are the same every time: does `generic` exist, what shape does `inductor=cute` or `american` draw, what is the default coil height, how large is the `sV` circle, and how does a bipole stretch. Only the symbol under discussion varies.",
+      "confidence": "high"
+    },
+    {
+      "id": "P4",
+      "description": "Every pass re-checks the same structural acceptance list on reconstruction.tex by reading and grepping: exactly one circuitikz environment, no `tikz` class option, no image inclusion, all required labels, balanced structure, and CircuitTikZ as the primary mechanism.",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "GenIteration1",
+          "evidence": "iterations/iteration-001/transcripts/generator/01-GenIteration1.md: `Document is standalone+circuitikz, self-contained, no image inclusion`; reads the 65-line source before emitting the result."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2b",
+          "evidence": "iterations/iteration-002/transcripts/generator/02-GenIteration2b.md runs a bash one-liner that greps the environment count and braces, then states `All checks pass: exactly one circuitikz environment parse-wise, no image inclusion, no tikz class option, balanced braces`."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2Gen",
+          "evidence": "iterations/iteration-002/transcripts/generator/03-GenIteration2Gen.md: `Exactly one circuitikz environment; plain TikZ confined to the converter block, the dashed group boxes and the annotations; no image inclusion`."
+        },
+        {
+          "iteration": 3,
+          "agent": "GenIteration3",
+          "evidence": "iterations/iteration-003/transcripts/generator/01-GenIteration3.md: `Structure is unchanged: exactly one circuitikz environment, border=6pt standalone (no tikz class option), no image inclusion`."
+        },
+        {
+          "iteration": 3,
+          "agent": "RevIteration3",
+          "evidence": "iterations/iteration-003/transcripts/reviewer/01-RevIteration3.md summary asserts `CircuitTikZ is the primary mechanism (to[L], to[R], to[generic], to[sV]; plain TikZ only for the converter block rectangle+diagonal ...)`."
+        }
+      ],
+      "generalization": "Same file, same checklist, same expected answers; only the iteration number changes. The check is factual and does not require visual judgement, yet it is re-read and re-asserted on every pass.",
+      "confidence": "high"
+    },
+    {
+      "id": "P5",
+      "description": "The render-crop question is re-diagnosed: is the PDF/PNG tightly cropped to the drawing, what are page and ink dimensions, and why does standalone fail to crop?",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md reads `scripts/render.sh`, `logs/render.stdout.log`, greps `standalone.cls` and `preview.sty`, and runs `bash(ls -la probe/...)` which errors; finding `reconstruction.png is a full US-Letter page ... aspect 0.77`."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2",
+          "evidence": "iterations/iteration-002/transcripts/generator/01-GenIteration2.md: `Fix the crop by dropping the tikz class option` and source comment `with it, standalone falls back to a full letter page for circuitikz pictures`."
+        },
+        {
+          "iteration": 2,
+          "agent": "RevIteration2",
+          "evidence": "iterations/iteration-002/transcripts/reviewer/01-RevIteration2.md: `the rendered artifact is now tightly cropped: the PDF page is 356.7x138.7 pt (aspect 2.57)`."
+        },
+        {
+          "iteration": 3,
+          "agent": "RevIteration3",
+          "evidence": "iterations/iteration-003/transcripts/reviewer/01-RevIteration3.md summary: `the PNG is tightly cropped to the drawing`."
+        }
+      ],
+      "generalization": "Same artifacts and same computation (page bbox versus ink bbox, aspect ratio); only which iteration's render is measured varies. Iteration 1 needed a ten-call investigation of `standalone.cls` and `preview.sty`; iterations 2 and 3 re-measured the same quantities to confirm the fix.",
+      "confidence": "high"
+    },
+    {
+      "id": "P6",
+      "description": "When agents need raster measurements they attempt eval or hand-roll image decoders, which are blocked or incomplete, and leave throwaway analysis files behind.",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md: the tool call `eval(py)` returns an error that `eval` is blocked by user policy."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2b",
+          "evidence": "iterations/iteration-002/transcripts/generator/02-GenIteration2b.md: a PIL attempt tracebacks, then `ModuleNotFoundError: No module named 'numpy'`, then five `zlib,struct` PNG-decoder calls."
+        },
+        {
+          "iteration": 2,
+          "agent": "RevIteration2",
+          "evidence": "iterations/iteration-002/transcripts/reviewer/01-RevIteration2.md: `read(tmp/analyze.py) => ok, 10 lines` and `read(tmp/probe.txt) => ok, 1 line`, leftover ad hoc analysis files from the earlier attempts."
+        }
+      ],
+      "generalization": "The missing capability is always `measure pixel geometry of a PNG`; what varies is the attempted implementation (eval, PIL, numpy, raw zlib/struct decoder, or reading another agent's leftovers).",
+      "confidence": "high"
+    },
+    {
+      "id": "P7",
+      "description": "Every agent run begins by reading the same unchanged workflow and reference files before doing any actual work.",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "GenIteration1",
+          "evidence": "iterations/iteration-001/transcripts/generator/01-GenIteration1.md reads `workflow/objective.md`, `workflow/completion-criteria.md`, `workflow/generator-instructions.md`, `reference/domain-rules.md`, and `workflow/current-human-feedback.md`."
+        },
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md reads `workflow/objective.md`, `workflow/completion-criteria.md`, `workflow/reviewer-instructions.md`, `reference/domain-rules.md`, and `workflow/current-human-feedback.md`."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2",
+          "evidence": "iterations/iteration-002/transcripts/generator/01-GenIteration2.md reads objective, completion criteria, generator instructions, and domain rules."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2b",
+          "evidence": "iterations/iteration-002/transcripts/generator/02-GenIteration2b.md reads the same four files plus human feedback."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2Gen",
+          "evidence": "iterations/iteration-002/transcripts/generator/03-GenIteration2Gen.md reads the same four files plus human feedback."
+        },
+        {
+          "iteration": 2,
+          "agent": "RevIteration2",
+          "evidence": "iterations/iteration-002/transcripts/reviewer/01-RevIteration2.md reads objective, completion criteria, reviewer instructions, domain rules, and human feedback."
+        },
+        {
+          "iteration": 3,
+          "agent": "GenIteration3",
+          "evidence": "iterations/iteration-003/transcripts/generator/01-GenIteration3.md reads objective, completion criteria, generator instructions, domain rules, and human feedback."
+        },
+        {
+          "iteration": 3,
+          "agent": "RevIteration3",
+          "evidence": "iterations/iteration-003/transcripts/reviewer/01-RevIteration3.md reads objective, completion criteria, reviewer instructions, domain rules, and human feedback."
+        }
+      ],
+      "generalization": "These files are byte-identical across iterations 1-3 and no human feedback was supplied. Only the role changes which instruction file is read; the other five reads are constant.",
+      "confidence": "high"
+    },
+    {
+      "id": "P8",
+      "description": "Agents guess a path from convention, get `not found`, then list or glob and retry.",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "GenIteration1",
+          "evidence": "iterations/iteration-001/transcripts/generator/01-GenIteration1.md: two `grep(.../tex/latex/circuitikz/pgfcircbipoles.tex) => error, Path not found` calls, followed by `glob(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/*)`."
+        },
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md: `glob(/usr/share/texlive/texmf-dist/tex/latex/preview) => error` and `bash(ls -la probe/) => error`."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2Gen",
+          "evidence": "iterations/iteration-002/transcripts/generator/03-GenIteration2Gen.md: `read(current/reconstruction.0.txt) => error, Path not found`."
+        },
+        {
+          "iteration": 3,
+          "agent": "RevIteration3",
+          "evidence": "iterations/iteration-003/transcripts/reviewer/01-RevIteration3.md: `read(iterations/iteration-002/review-result.json) => error`, then `read(iterations/iteration-002/results/review-result.json)`."
+        }
+      ],
+      "generalization": "The failed guesses are always paths that differ from the repository's actual layout: TeX Live `tex/latex/circuitikz` versus `tex/generic/circuitikz`, `iterations/iteration-NNN/review-result.json` versus `.../results/review-result.json`, a scratch file that was never created, and a probe directory that was never created.",
+      "confidence": "high"
+    },
+    {
+      "id": "P9",
+      "description": "A geometry finding measured by eye becomes a nextAction, the next reviewer re-measures the same region and reverses it, and the generator spends a pass implementing the wrong geometry.",
+      "occurrences": [
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md major finding `Z_g floats ~2 cm inside the grid box instead of straddling the divider`; nextAction `keep Z_g at ~8.05-9.05`."
+        },
+        {
+          "iteration": 1,
+          "agent": "RevIteration1",
+          "evidence": "iterations/iteration-001/transcripts/reviewer/01-RevIteration1.md minor finding `converter block is a 3x3 square, whereas in the target it is a portrait rectangle`; nextAction `Make the converter block 2.5 wide x 3 tall`."
+        },
+        {
+          "iteration": 2,
+          "agent": "GenIteration2",
+          "evidence": "iterations/iteration-002/transcripts/generator/01-GenIteration2.md implements both actions: `Z_g (8.05-9.0) straddles the divider band 8.35-8.6` and `portrait 2.5x3 converter block`."
+        },
+        {
+          "iteration": 2,
+          "agent": "RevIteration2",
+          "evidence": "iterations/iteration-002/transcripts/reviewer/01-RevIteration2.md: `The iteration-1 instruction to make Z_g straddle the divider is contradicted by the target`; `the target block is essentially square (~185 x 182 px)`."
+        },
+        {
+          "iteration": 3,
+          "agent": "GenIteration3",
+          "evidence": "iterations/iteration-003/transcripts/generator/01-GenIteration3.md reverses both: `Z_g is now at z1=(9.3,2.2) / z2=(10.35,2.2) ... wholly inside the grid box` and `converter block is now a 2.5 x 2.5 square`."
+        }
+      ],
+      "generalization": "Two independent target measurements were made by eye in iteration 1, encoded as nextActions, implemented in iteration 2, then re-measured and reversed in iteration 3. What varies is the element; the failure mode is the same: an approximate visual measurement becomes authoritative review evidence without a reproducible measurement record.",
+      "confidence": "high"
+    }
+  ],
+  "toolProposals": [
+    {
+      "name": "measure_diagram_geometry",
+      "purpose": "Return deterministic pixel, centimetre, and normalized-fraction geometry for the target, the render, and the TeX source in one call.",
+      "description": "Measure diagram geometry and return facts, not opinions. Call it before making any claim about element position, size, spacing, aspect ratio, crop, or the relation between a label and a dashed border, and when converting explicit (x,y) coordinates in current/reconstruction.tex into fractions of the drawing. Supply one image and optionally a second image to compare (for example reference/target.png and current/reconstruction.png), and/or source_tex. It returns: image/page dimensions, DPI, page aspect, ink bounding box, page margins, and a tight_crop boolean; per-element tight bounding boxes, centres, width/height in pixels and centimetres, and normalized frac_x0/frac_x1/frac_y0/frac_y1 values; the same fields derived from explicit absolute coordinates in the source; optional per-element deltas against baseline_json; and warnings about uncertain measurements. It never decides whether a layout is faithful, which symbol is better, or whether a difference is acceptable; those remain review judgements. Do not call it for symbol selection, textual label correctness, or to replace an exact source coordinate when the source already gives one.",
+      "inputs": [
+        {
+          "name": "image_path",
+          "type": "string",
+          "required": false,
+          "description": "Path to a PNG or PDF to measure, typically reference/target.png or current/reconstruction.png. Required unless source_tex is supplied."
+        },
+        {
+          "name": "compare_image",
+          "type": "string",
+          "required": false,
+          "description": "Second image measured with the same regions and normalization, typically the render when image_path is the target. Adds a deltas array."
+        },
+        {
+          "name": "source_tex",
+          "type": "string",
+          "required": false,
+          "description": "Path to a CircuitTikZ source. The tool parses explicit `coordinate (name) at (x,y)`, `draw ... rectangle ...`, and `node at (x,y)` constructs and reports their extents and fractions."
+        },
+        {
+          "name": "regions",
+          "type": "array",
+          "required": false,
+          "description": "Named measurement windows, each `{name, box:[x0,y0,x1,y1]}` in image pixels. The tool tightens each window to the ink inside it. Omit to receive unlabeled connected-component candidates."
+        },
+        {
+          "name": "drawing_bbox",
+          "type": "array",
+          "required": false,
+          "description": "Four numbers [x0,y0,x1,y1] overriding the auto-detected ink bounding box used for all normalized fractions."
+        },
+        {
+          "name": "dpi",
+          "type": "number",
+          "required": false,
+          "description": "Override DPI detection when converting pixels to centimetres; the renderer currently uses 180 dpi."
+        },
+        {
+          "name": "baseline_json",
+          "type": "string",
+          "required": false,
+          "description": "Path to a previous output of this tool. Adds per-element deltas, typically used to compare a new render with a cached target baseline."
+        }
+      ],
+      "outputs": "JSON object: `{primary:{path,width_px,height_px,dpi,page_aspect,ink_bbox_px,margins_px,drawing_aspect,tight_crop}, compare:{...same...}, elements:[{name,kind,x0,y0,x1,y1,cx,cy,width_px,height_px,width_cm,height_cm,frac_x0,frac_x1,frac_y0,frac_y1}], source:{bbox_cm,elements:[...same fields in cm and fractions]}, deltas:[{name,dx_frac,dy_frac,dw_frac,dh_frac}], warnings:[...]}`.",
+      "patternIds": [
+        "P1",
+        "P2",
+        "P5",
+        "P6",
+        "P9"
+      ],
+      "expectedSavings": "Removes roughly 60-70 manual pixel/fraction measurements and 25-35 measurement-related round trips across the three archived iterations; replaces the five-call, ~200-line hand-rolled PNG decoder in iteration 2b with one call; turns the iteration-1 crop investigation (render.sh, render log, standalone.cls, preview.sty, fls, failed probe: about ten calls) into one boolean plus page/ink measurements. Most importantly it would have settled the Z_g/divider and converter-block aspect in iteration 1, avoiding the wrong nextActions that iteration 2 implemented and iteration 3 reversed, which is roughly one full generation pass.",
+      "risks": "Threshold and antialiasing choices can move an ink bounding box by 1-2 px; dashed borders near a label can merge into one component; an auto-detected drawing bbox can include page furniture and skew every fraction; the source parser only handles explicit absolute coordinates, not `++`, `calc`, or macros. A stale baseline silently produces meaningless deltas. Mitigation: accept named windows, report the threshold and raw boxes, and never auto-assign semantic names.",
+      "confidence": "high"
+    },
+    {
+      "name": "lookup_circuitikz_component",
+      "purpose": "Answer what the installed CircuitTikZ version provides for a named component or style key, with file and line evidence.",
+      "description": "Look up a CircuitTikZ component (`L`, `R`, `generic`, `sV`, and similar) or style key (`inductor`, `resistor`, `bipoles/americaninductor/coil height`) in the installed TeX Live tree and return the declaration site and defaults. Call it before choosing a component, before changing a symbol style, or when a review finding depends on the symbol's real geometry (coil height, source circle size, bipole stretch). It returns the package version, declaration file and line, aliases, bipole class, default length and height in centimetres, style keys with defaults and effects, label anchors, and suggestions for unresolved keys. It does not decide which symbol is visually better or whether a symbol matches the target; do not call it for TikZ core syntax or for aesthetic comparison.",
+      "inputs": [
+        {
+          "name": "component",
+          "type": "string",
+          "required": true,
+          "description": "Component or style key to resolve, for example `L`, `generic`, `sV`, `inductor`, or `bipoles/americaninductor/coil height`."
+        },
+        {
+          "name": "detail",
+          "type": "string",
+          "required": false,
+          "description": "One of `summary`, `declaration`, `styles`, or `all`; default `summary`."
+        },
+        {
+          "name": "texlive_root",
+          "type": "string",
+          "required": false,
+          "description": "TeX Live root override; default auto-detection via the installed package paths."
+        }
+      ],
+      "outputs": "JSON object: `{component, version, found, aliases, declaration:{file,line}, bipole_class, default_length_cm, default_height_cm, style_keys:[{key,default,effect}], label_anchors, notes, suggestions}`.",
+      "patternIds": [
+        "P3"
+      ],
+      "expectedSavings": "Iteration 1 spent about 19 package-source calls, including two failed path guesses, and read 1,000+ lines; iteration 3 spent 11 calls and about 1,900 lines re-deriving the same declarations and defaults. One lookup per symbol returns the same facts in a few hundred tokens, saving an estimated 15,000-30,000 input tokens and 10-19 round trips per styling iteration.",
+      "risks": "A different TeX Live layout or version can change defaults; alias and declaration parsing can miss indirection through `pgfcircdeclarebipole`; package options such as `european` override some style defaults, so the tool must report the effective value only when it can see the preamble. A wrong default would produce a confidently wrong source edit.",
+      "confidence": "high"
+    },
+    {
+      "name": "lint_reconstruction_tex",
+      "purpose": "Run the loop's factual source checklist on reconstruction.tex and return pass, warning, or failure with line numbers.",
+      "description": "Statically inspect a CircuitTikZ source for the loop's structural acceptance conditions: exactly one `circuitikz` environment; a `standalone` class without the `tikz` option when circuitikz is loaded; no `includegraphics` or `reference/target.png`; all required labels present outside comments; balanced braces and environments; every referenced `coordinate` defined; and a component inventory of `to[L]`, `to[R]`, `to[generic]`, `to[sV]`. Call it before writing a generation result and at the start of review so structural claims are mechanical rather than re-read from the source. It returns a JSON object with `checks` (id, status, message, line), `counts`, and `summary`. It does not compile, render, measure geometry, or judge visual fidelity, symbol choice, electrical correctness, or whether the drawing is faithful. Do not call it as a substitute for scripts/validate.sh after rendering.",
+      "inputs": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": false,
+          "description": "Source path; default `current/reconstruction.tex`."
+        },
+        {
+          "name": "required_labels",
+          "type": "array",
+          "required": false,
+          "description": "Label tokens that must appear outside comments; default [L_f, R_f, i, v, +, -, Z_g, v_g, DC, AC, GFM converter, grid]. Math tokens are matched as whole tokens so `v` does not match inside `v_g`."
+        },
+        {
+          "name": "forbid_patterns",
+          "type": "array",
+          "required": false,
+          "description": "Regular expressions that must not appear; default [`includegraphics`, `reference/target.png`]."
+        }
+      ],
+      "outputs": "JSON object: `{path, checks:[{id,status:'passed'|'warning'|'failed',message,line}], counts:{circuitikz_environments,coordinates,components}, summary}`.",
+      "patternIds": [
+        "P4",
+        "P5"
+      ],
+      "expectedSavings": "Removes one bash/grep check in iteration 2b and the need to re-read the source solely to confirm the checklist, and gives every pass the same answers in one call. Its main saving is error-class avoidance: a warning on `documentclass[tikz]{standalone}` plus circuitikz would have caught the iteration-1 uncropped page before render.sh, avoiding one major finding and one extra generation iteration. Estimated 1-2 round trips per pass plus one full review-and-revision cycle avoided when the class-option defect recurs.",
+      "risks": "Regex-based label detection can match comments or node names; the `tikz` class option is valid for pure TikZ, so it must be a warning when circuitikz is present; a false failure could block a valid source. Mitigation: ignore comments, report line numbers and severity, and never auto-edit.",
+      "confidence": "medium"
+    }
+  ],
+  "nonToolRecommendations": [
+    {
+      "description": "Inject the unchanged workflow and reference files into each subagent's prompt instead of requiring five or six read calls at the start of every pass.",
+      "rationale": "objective.md, completion-criteria.md, the role instructions, domain-rules.md, and current-human-feedback.md are byte-identical across iterations 1-3 and no human feedback was supplied. All eight agent passes re-read them. The agent definitions already enumerate the paths, so a single prompt-injected context block preserves authority and removes the repeated reads.",
+      "expectedSavings": "Roughly 45 read round trips across the eight archived agent passes and 120-180 lines of static text read per pass."
+    },
+    {
+      "description": "Never dispatch the generator or reviewer role to a generic task worker; use only diagram-generator and diagram-reviewer, which carry the declared output schema and tool policy.",
+      "rationale": "Iteration 2's first pass returned keys `path`, `description`, and `content` instead of `filename`, `reason`, and `addedCode`, so the result was discarded; the second pass was cancelled; the third correct pass redid the verification. The generic worker also had Bash and could run ad hoc Python, which the diagram-generator deliberately cannot.",
+      "expectedSavings": "One discarded generation pass and one cancelled pass in iteration 2, about 15KB of transcripts, plus the re-verification work in 03-GenIteration2Gen."
+    },
+    {
+      "description": "Add a canonical workspace and archive path map to the agent context, including `iterations/iteration-NNN/results/review-result.json` and the `tex/generic/circuitikz` package location.",
+      "rationale": "Four `Path not found` retries across three iterations came from guessing a conventional path instead of the repository's actual layout. The map is static and costs one paragraph.",
+      "expectedSavings": "Four failed reads and their retry round trips over three iterations."
+    },
+    {
+      "description": "Remove the end-of-pass schema-file reads; the result schema is already declared in .omp/agents/diagram-generator.md and .omp/agents/diagram-reviewer.md, and scripts/persist-result.sh validates before promotion.",
+      "rationale": "GenIteration1, RevIteration1, and RevIteration2 each read a 55-68 line schema file that duplicates the agent definition. The malformed iteration-2 result came from a generic worker with no schema at all, not from the diagram agents misreading it.",
+      "expectedSavings": "About 190 lines of redundant reading across three passes."
+    },
+    {
+      "description": "Generate reference/target-geometry.json once from the measurement tool and let reviewers compare against it; re-measure reference/target.png only when the target changes.",
+      "rationale": "The target is immutable input, but every review re-measures it and the measurements were unstable enough to reverse two findings. A checked-in baseline makes the target fractions explicit and auditable between passes.",
+      "expectedSavings": "Two target reads and roughly 10-20 target measurements per review once the baseline exists; removes the measurement instability behind P9."
+    }
+  ],
+  "rejectedPatterns": [
+    {
+      "description": "A generic task worker produced a schema-invalid generation result and a second pass was cancelled in iteration 2.",
+      "reason": "Only two sightings, both in iteration 2 (01-GenIteration2 and 02-GenIteration2b), so it fails the two-distinct-iterations or three-in-one-iteration bar. The malformed result was already caught by scripts/persist-result.sh before it became state; a new validator would re-wrap that script. The actionable fix is delegation discipline, recorded under nonToolRecommendations."
+    },
+    {
+      "description": "The coordinator stages transcripts and writes candidate result JSON by hand on every iteration.",
+      "reason": "Persistence is already deterministic: persist-result.sh validates against the schema and atomically renames. Transcript staging is a fixed mkdir/cat/front-matter recipe, and workflow/coordinator.md states that history:// resolves only in a direct shell, so an MCP tool cannot fetch the transcripts either. No model computation or judgement is involved."
+    },
+    {
+      "description": "Reviewers re-read the previous iteration's review and source to check whether its findings were addressed.",
+      "reason": "Reviewer-instructions criterion 9 requires checking previous findings and human feedback, which is a judgement comparison against a prior review, not a reproducible computation. The previous review is already named in the prompt; a tool would have to decide whether a finding is resolved."
+    },
+    {
+      "description": "Diff the new render against the previous iteration's render.",
+      "reason": "No transcript shows a render-to-render comparison; every visual comparison is target-versus-current. Iteration 2's reviewer reads the iteration-1 source and review, not the iteration-1 PNG. Proposing a render diff would be speculation rather than observed repetition."
+    },
+    {
+      "description": "Automatically detect whether a dashed group border crosses a label glyph.",
+      "reason": "Observed only in iterations 2-3. Exact glyph bounding boxes require font metrics, and a false `clear` would reintroduce the defect the reviewer caught. The explicit `no dashed line through a glyph` criterion plus explicit label nodes already resolved it; keep this as review judgement rather than a tool."
+    },
+    {
+      "description": "Repeated compilation-failure diagnosis.",
+      "reason": "No LaTeX compile failure occurred: renderingStatus is passed in all three validation results, and the only render defect is the iteration-1 full-page crop evidenced by the Overfull hbox in iterations/iteration-001/logs/render.stdout.log. Only the crop symptom repeats, and it is covered by P5."
+    }
+  ],
+  "openQuestions": [
+    "Should these capabilities ship as MCP tools available to the read-only subagents, or as coordinator-invoked scripts? The Generator and Reviewer intentionally have no Bash and eval is denied in .omp/config.yml, so only MCP tools can give them deterministic measurement without loosening the security boundary.",
+    "Should reference/target-geometry.json become a checked-in baseline generated once, or should every pass re-measure reference/target.png? A stale baseline would hide a changed target.",
+    "Should measure_diagram_geometry require caller-supplied named regions, or may it auto-label connected components? Auto-labelling edges toward symbol recognition and judgement.",
+    "Should lint_reconstruction_tex treat documentclass[tikz]{standalone} plus circuitikz as a hard failure or a warning? It caused the iteration-1 uncropped page but is valid LaTeX.",
+    "What measurement tolerance should make a geometry finding major versus minor? The archived reviews used ad hoc thresholds, for example a 0.09-width divider error as major and a 0.007-width caption offset as minor; the tool can report deltas but cannot choose severity."
+  ],
+  "blocker": null
+}

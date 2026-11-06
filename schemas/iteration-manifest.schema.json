@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "iteration-manifest.schema.json",
+  "title": "Iteration manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "iteration",
+    "archivedAt",
+    "status",
+    "files",
+    "terminationReason"
+  ],
+  "properties": {
+    "iteration": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "archivedAt": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accept",
+        "revise",
+        "human-review",
+        "blocked",
+        "failed",
+        "unknown"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "terminationReason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
