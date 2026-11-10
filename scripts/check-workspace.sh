@@ -18,6 +18,14 @@ for file in \
   .omp/agents/diagram-generator.md \
   .omp/agents/diagram-reviewer.md \
   .omp/agents/efficiency.md \
+  .omp/mcp.json \
+  .omp/skills/png-diagram-measure/SKILL.md \
+  scripts/png-measure-install.sh \
+  scripts/png-measure-start.sh \
+  scripts/png-measure-smoke.sh \
+  scripts/promote-baseline.sh \
+  schemas/png-measurement.schema.json \
+  schemas/png-trace.schema.json \
   workflow/efficiency-analysis.md \
   scripts/render-efficiency-report.py \
   schemas/efficiency-report.schema.json \

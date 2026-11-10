@@ -24,7 +24,10 @@ Install and configure:
 3. Python 3;
 4. a LaTeX distribution containing CircuitTikZ;
 5. either `latexmk`, `lualatex`, or `pdflatex`;
-6. either `pdftoppm` or ImageMagick `magick` for PDF-to-PNG conversion.
+6. either `pdftoppm` or ImageMagick `magick` for PDF-to-PNG conversion;
+7. `uv` for the PNG measurement MCP server;
+8. a Pharo 13.1 image and VM for the PNG measurement service (optional, only when
+   the measurement tools are used).
 
 The scripts do not download packages or modify the host installation.
 
@@ -60,6 +63,45 @@ scripts/check-workspace.sh
 
 `init-current.sh` copies `input/initial-reconstruction.tex` into `current/`
 without overwriting an existing reconstruction.
+
+## PNG measurement tool (optional)
+
+The generator and reviewer can call typed PNG measurement tools through MCP.
+The tools inspect a PNG, build an ink mask, measure canvas and ink bounds,
+measure named regions, convert geometry between bases, and build a deterministic
+baseline document. They do not identify electrical components.
+
+One-time install into a dedicated Pharo image:
+
+```bash
+export PHARO="$HOME/pharo-launcher/pharo-vm/pharo"
+export PDMT_BASE_IMAGE="$HOME/Pharo/images/Pharo13.1/Pharo13.1.image"
+scripts/png-measure-install.sh
+```
+
+The install script loads `PngDiagramMeasure`, registers `PmdtServer` in the image
+startup list, and snapshots. The start script runs the saved image once per boot;
+do not reload the Pharo code per reconstruction iteration:
+
+```bash
+scripts/png-measure-start.sh
+```
+
+The measurement service listens on `127.0.0.1:8087` by default. It is local-only
+and unauthenticated; do not expose it. `.omp/mcp.json` starts the Python shim
+with `uv`; the shim forwards typed JSON to the Pharo service and preserves the
+response envelope even on 4xx/5xx.
+
+The trace log records one JSON line per measurement call:
+
+```bash
+tail -f tmp/png-measure/tool-trace.jsonl
+curl -s 'http://127.0.0.1:8087/png/trace?limit=50'
+```
+
+`png_trace` is diagnostic only. It is not measurement evidence and is not part of
+the reconstruction loop. See `tools/png-measure/README.md` for environment
+variables, routes, and promotion of `reference/target.measurements.json`.
 
 ## Start the workflow
 

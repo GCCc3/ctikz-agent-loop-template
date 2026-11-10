@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PDM tool trace report",
+  "type": "object",
+  "required": ["entries", "counts", "log", "truncated"],
+  "properties": {
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "schema_version",
+          "run_id",
+          "sequence",
+          "timestamp",
+          "phase",
+          "request_id",
+          "client_id",
+          "client_role",
+          "tool",
+          "outcome",
+          "warning_codes",
+          "duration_ms",
+          "region_count",
+          "empty_region_count",
+          "output_written",
+          "result_bytes"
+        ],
+        "properties": {
+          "schema_version": { "const": 1, "type": "integer" },
+          "run_id": { "type": "string" },
+          "sequence": { "type": "integer", "minimum": 1 },
+          "timestamp": { "type": "string" },
+          "phase": { "type": "string" },
+          "request_id": { "type": "string" },
+          "client_id": { "type": "string" },
+          "client_role": { "type": "string" },
+          "tool": { "type": "string" },
+          "outcome": {
+            "type": "string",
+            "enum": ["ok", "ok_with_warnings", "error", "rejected"]
+          },
+          "error_code": { "type": ["string", "null"] },
+          "warning_codes": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "duration_ms": { "type": "number", "minimum": 0 },
+          "image_path": { "type": ["string", "null"] },
+          "image_sha256": { "type": ["string", "null"] },
+          "region_count": { "type": "integer", "minimum": 0 },
+          "empty_region_count": { "type": "integer", "minimum": 0 },
+          "output_written": { "type": "boolean" },
+          "result_bytes": { "type": "integer", "minimum": 0 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["total", "by_tool", "by_outcome", "by_warning", "by_client"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "by_tool": { "type": "object", "additionalProperties": { "type": "integer" } },
+        "by_outcome": { "type": "object", "additionalProperties": { "type": "integer" } },
+        "by_warning": { "type": "object", "additionalProperties": { "type": "integer" } },
+        "by_client": { "type": "object", "additionalProperties": { "type": "integer" } }
+      },
+      "additionalProperties": true
+    },
+    "log": {
+      "type": "object",
+      "required": ["path", "entries", "bytes"],
+      "properties": {
+        "path": { "type": "string" },
+        "entries": { "type": "integer", "minimum": 0 },
+        "bytes": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "truncated": { "type": "boolean" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "png-diagram-measure": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "tools/png-measure/mcp",
+        "run",
+        "png-diagram-measure-mcp-server"
+      ],
+      "env": {
+        "PDMT_PORT": "${PDMT_PORT:-8087}",
+        "PDMT_HOST": "${PDMT_HOST:-127.0.0.1}",
+        "PDMT_REPO_ROOT": "${PDMT_REPO_ROOT:-.}",
+        "PDMT_OUTPUT_ROOT": "${PDMT_OUTPUT_ROOT:-tmp/png-measure}",
+        "PDMT_TRACE_LOG": "${PDMT_TRACE_LOG:-tmp/png-measure/tool-trace.jsonl}",
+        "PDMT_CLIENT_ROLE": "${PDMT_CLIENT_ROLE:-}"
+      }
+    }
+  }
+}

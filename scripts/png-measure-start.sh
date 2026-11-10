@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="${PDMT_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+PHARO="${PHARO:-pharo}"
+PDMT_IMAGE="${PDMT_IMAGE:-$REPO_ROOT/tmp/png-measure/PngMeasure.image}"
+PDMT_PORT="${PDMT_PORT:-8087}"
+PDMT_HOST="${PDMT_HOST:-127.0.0.1}"
+PDMT_OUTPUT_ROOT="${PDMT_OUTPUT_ROOT:-$REPO_ROOT/tmp/png-measure}"
+PDMT_TRACE_LOG="${PDMT_TRACE_LOG:-$PDMT_OUTPUT_ROOT/tool-trace.jsonl}"
+PDMT_MAX_PIXELS="${PDMT_MAX_PIXELS:-50000000}"
+PDMT_TRACE_ENTRIES="${PDMT_TRACE_ENTRIES:-1000}"
+PDMT_TRACE_MAX_BYTES="${PDMT_TRACE_MAX_BYTES:-5000000}"
+PDMT_DEBUG="${PDMT_DEBUG:-0}"
+PDMT_AUTOSTART=1
+
+if [[ ! -f "$PDMT_IMAGE" ]]; then
+  echo "PDMT_IMAGE does not exist: $PDMT_IMAGE" >&2
+  echo "Run scripts/png-measure-install.sh first." >&2
+  exit 2
+fi
+
+export PDMT_AUTOSTART PDMT_PORT PDMT_HOST PDMT_OUTPUT_ROOT PDMT_TRACE_LOG
+export PDMT_MAX_PIXELS PDMT_TRACE_ENTRIES PDMT_TRACE_MAX_BYTES PDMT_DEBUG PDMT_REPO_ROOT
+exec "$PHARO" --headless "$PDMT_IMAGE"
