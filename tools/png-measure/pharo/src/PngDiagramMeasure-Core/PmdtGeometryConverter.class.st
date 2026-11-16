@@ -14,16 +14,16 @@ PmdtGeometryConverter class >> convert: aDictionary from: fromString to: toStrin
 	type := aDictionary at: 'type'.
 	coordinates := aDictionary at: 'coordinates'.
 	(type = 'point' and: [ coordinates size ~= 2 ])
-		ifTrue: [ PmdtError code: 'invalid_request' message: 'A point must have two coordinates' ].
+		ifTrue: [ DsktError code: 'invalid_request' message: 'A point must have two coordinates' ].
 	(type = 'box' and: [ coordinates size ~= 4 ])
-		ifTrue: [ PmdtError code: 'invalid_request' message: 'A box must have four coordinates' ].
+		ifTrue: [ DsktError code: 'invalid_request' message: 'A box must have four coordinates' ].
 	(type = 'point' or: [ type = 'box' ])
-		ifFalse: [ PmdtError code: 'invalid_request' message: 'Only point and box geometry are supported' ].
+		ifFalse: [ DsktError code: 'invalid_request' message: 'Only point and box geometry are supported' ].
 	imageBox := PmdtBBox fullWidth: aPmdtRgbaImage width height: aPmdtRgbaImage height.
 	inkBox := aPmdtInkMask primaryBoundingBox.
 	warnings := OrderedCollection new.
 	(type = 'point' and: [ (#('normalized_ink' 'ink_pixels' 'centimetres') includes: fromString) and: [ inkBox isNil ] ])
-		ifTrue: [ PmdtError code: 'invalid_request' message: 'The selected source basis requires a non-empty ink mask' ].
+		ifTrue: [ DsktError code: 'invalid_request' message: 'The selected source basis requires a non-empty ink mask' ].
 	imageCoords := self toImagePixels: coordinates type: type from: fromString image: aPmdtRgbaImage inkBox: inkBox dpiX: dpiX dpiY: dpiY warnings: warnings.
 	targetCoords := self fromImagePixels: imageCoords type: type to: toString image: aPmdtRgbaImage inkBox: inkBox dpiX: dpiX dpiY: dpiY warnings: warnings.
 	exact := (targetCoords allSatisfy: [ :each | each notNil ]).
@@ -54,10 +54,10 @@ PmdtGeometryConverter class >> toImagePixels: coordinates type: type from: fromS
 			{ inkBox x0 + (x * inkBox width) . inkBox y0 + (y * inkBox height) } ] ].
 	fromString = 'centimetres' ifTrue: [
 		(dpiX isNil or: [ dpiY isNil ])
-			ifTrue: [ PmdtError code: 'dpi_unknown' message: 'Centimetre conversion requires DPI' ].
+			ifTrue: [ DsktError code: 'dpi_unknown' message: 'Centimetre conversion requires DPI' ].
 		^ self mapPairs: coordinates type: type do: [ :x :y |
 			{ x * dpiX / 2.54 . y * dpiY / 2.54 } ] ].
-	PmdtError code: 'unknown_basis' message: 'Unsupported source basis: ' , fromString printString
+	DsktError code: 'unknown_basis' message: 'Unsupported source basis: ' , fromString printString
 ]
 
 { #category : 'private' }
@@ -80,7 +80,7 @@ PmdtGeometryConverter class >> fromImagePixels: coordinates type: type to: toStr
 				^ coordinates collect: [ :each | nil ] ].
 		result := self mapPairs: coordinates type: type do: [ :x :y |
 			{ x * 2.54 / dpiX . y * 2.54 / dpiY } ] ].
-	result ifNil: [ PmdtError code: 'unknown_basis' message: 'Unsupported destination basis: ' , toString printString ].
+	result ifNil: [ DsktError code: 'unknown_basis' message: 'Unsupported destination basis: ' , toString printString ].
 	self checkOutside: result type: type basis: toString image: aPmdtRgbaImage inkBox: inkBox dpiX: dpiX dpiY: dpiY warnings: warnings.
 	^ result
 ]

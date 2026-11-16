@@ -19,7 +19,7 @@ Class {
 { #category : 'instance creation' }
 PmdtBBox class >> fromArray: anArray [
 	(anArray isNil or: [ anArray size ~= 4 ])
-		ifTrue: [ PmdtError code: 'invalid_region' message: 'A bounding box must have four coordinates' ].
+		ifTrue: [ DsktError code: 'invalid_region' message: 'A bounding box must have four coordinates' ].
 	^ self
 		x0: (anArray at: 1)
 		y0: (anArray at: 2)

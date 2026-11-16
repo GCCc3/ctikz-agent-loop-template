@@ -3,6 +3,8 @@ name: diagram-reviewer
 description: Independently review the current CircuitTikZ reconstruction and decide whether to accept, revise, request human review, or report a blocker.
 tools:
   - read
+  - ctikz_lookup_component
+  - ctikz_lint_source
 # model: "@reviewer"
 thinking-level: high
 output:
@@ -74,6 +76,11 @@ Read:
 Inspect both the target and rendered image with the image-reading capability
 available to the session. Base factual claims about compilation and deterministic
 checks only on `current/validation-result.json`.
+
+Use `ctikz_lookup_component` for symbol/style facts and
+`ctikz_lint_source` for structural claims. Lint checks structure only; it does
+not establish visual fidelity. Do not invent component semantics that the
+lookup tool does not return.
 
 Return exactly one decision:
 

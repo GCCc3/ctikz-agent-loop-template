@@ -61,7 +61,7 @@ PmdtLuminanceClassifier class >> maskFor: aPmdtRgbaImage parameters: aPmdtMaskPa
 					x1: (maxsX at: i) + 1
 					y1: (maxsY at: i) + 1 ].
 		boxes
-			at: (PmdtCanonicalJson toString: (thresholds at: i))
+			at: (DsktCanonicalJson toString: (thresholds at: i))
 			put: box ].
 	^ PmdtInkMask
 		width: width

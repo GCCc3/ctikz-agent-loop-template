@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="${PDMT_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+REPO_ROOT="${DSKT_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 SOURCE="${1:-$REPO_ROOT/tmp/png-measure/target.baseline.json}"
 TARGET="${2:-$REPO_ROOT/reference/target.measurements.json}"
 SCHEMA="$REPO_ROOT/schemas/png-measurement.schema.json"

@@ -100,7 +100,7 @@ PmdtRegionMeasurer class >> convert: anArray units: aString image: aPmdtRgbaImag
 		x1 := inkBox x0 + ((anArray at: 3) * inkBox width).
 		y1 := inkBox y0 + ((anArray at: 4) * inkBox height) ].
 	(x0 isNil or: [ y0 isNil or: [ x1 isNil or: [ y1 isNil ] ] ])
-		ifTrue: [ PmdtError code: 'unknown_basis' message: 'Unsupported region units: ' , aString printString ].
+		ifTrue: [ DsktError code: 'unknown_basis' message: 'Unsupported region units: ' , aString printString ].
 	^ PmdtBBox
 		x0: x0 floor
 		y0: y0 floor
@@ -141,7 +141,7 @@ PmdtRegionMeasurer class >> sensitivityBoxesIn: aPmdtBBox image: aPmdtRgbaImage 
 			y1: aPmdtBBox y1
 			threshold: threshold
 			backgroundRgb: aPmdtMaskParameters backgroundRgb.
-		result at: (PmdtCanonicalJson toString: threshold) put: (box ifNil: [ nil ] ifNotNil: [ :each | each asArray ]) ].
+		result at: (DsktCanonicalJson toString: threshold) put: (box ifNil: [ nil ] ifNotNil: [ :each | each asArray ]) ].
 	^ result
 ]
 

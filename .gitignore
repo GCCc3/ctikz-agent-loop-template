@@ -1,3 +1,6 @@
 tmp/png-measure/
+tmp/dskt/
 tools/png-measure/mcp/.venv/
+tools/dskt/mcp/.venv/
+tools/dskt/mcp/**/__pycache__/
 PharoDebug.log

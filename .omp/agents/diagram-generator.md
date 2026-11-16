@@ -5,6 +5,11 @@ tools:
   - read
   - edit
   - write
+  - ctikz_list_snippets
+  - ctikz_get_snippet
+  - ctikz_render_snippet
+  - ctikz_lookup_component
+  - ctikz_lint_source
 # model: "@generator"
 thinking-level: high
 output:
@@ -76,6 +81,14 @@ coordinator responsibilities.
 Make focused, understandable edits. Preserve useful existing work. Address the
 latest review findings and human feedback explicitly. Do not modify files under
 `iterations/`.
+
+When a construct is needed, use the CircuitTikZ catalog tools:
+`ctikz_list_snippets` to find it, `ctikz_get_snippet` to inspect its schema,
+`ctikz_render_snippet` to render one leaf construct, and
+`ctikz_lookup_component` for component/style facts. Run
+`ctikz_lint_source` on the candidate source before writing it. Lint is
+structural only; it does not establish visual fidelity, and the catalog is a
+lookup library, not a document generator.
 
 Return one object satisfying the declared output schema. `addedCode` should
 contain the essential code added or materially changed for that file, not the

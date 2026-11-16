@@ -75,11 +75,13 @@ One-time install into a dedicated Pharo image:
 
 ```bash
 export PHARO="$HOME/pharo-launcher/pharo-vm/pharo"
-export PDMT_BASE_IMAGE="$HOME/Pharo/images/Pharo13.1/Pharo13.1.image"
+export DSKT_BASE_IMAGE="/path/to/base.image"
+# On this workstation:
+# export DSKT_BASE_IMAGE=/home/codespace/moose13-base/Moose13-stable-Pharo64-14/Moose13-stable-Pharo64-14.image
 scripts/png-measure-install.sh
 ```
 
-The install script loads `PngDiagramMeasure`, registers `PmdtServer` in the image
+The install script loads the domain baselines, registers `DsktServer` in the image
 startup list, and snapshots. The start script runs the saved image once per boot;
 do not reload the Pharo code per reconstruction iteration:
 
@@ -95,13 +97,46 @@ response envelope even on 4xx/5xx.
 The trace log records one JSON line per measurement call:
 
 ```bash
-tail -f tmp/png-measure/tool-trace.jsonl
+tail -f tmp/dskt/tool-trace.jsonl
 curl -s 'http://127.0.0.1:8087/png/trace?limit=50'
 ```
 
 `png_trace` is diagnostic only. It is not measurement evidence and is not part of
 the reconstruction loop. See `tools/png-measure/README.md` for environment
 variables, routes, and promotion of `reference/target.measurements.json`.
+
+## CircuitTikZ catalog and lint tools
+
+The common `dskt` MCP server exposes the PNG measurement tools and the
+CircuitTikZ tools against one Pharo `DsktServer` on `127.0.0.1:8087`:
+
+- `ctikz_list_snippets`, `ctikz_get_snippet`, `ctikz_lookup_component`;
+- `ctikz_render_snippet` for leaf constructs (no full documents);
+- `ctikz_lint_source` for structural checks of candidate TeX;
+- `dskt_health` and `dskt_trace` for shared diagnostics.
+
+Install the domain baselines into the same image and snapshot it:
+
+```bash
+export PHARO="$HOME/pharo-launcher/pharo-vm/pharo"
+export DSKT_BASE_IMAGE="/path/to/base.image"
+# On this workstation:
+# export DSKT_BASE_IMAGE=/home/codespace/moose13-base/Moose13-stable-Pharo64-14/Moose13-stable-Pharo64-14.image
+scripts/ctikz-tools-install.sh
+scripts/png-measure-start.sh
+```
+
+The catalog is a lookup library, not a document generator. The agent composes
+snippets and writes `current/reconstruction.tex`; the tools never write it.
+`ctikz_lint_source` is read-only and returns structural checks, not a visual
+fidelity verdict. `DSKT_MODULES` and `DSKT_TOOLS` can restrict a filtered MCP
+process to a subset such as `ctikz_lint`.
+
+Run the domain smoke test against a live server:
+
+```bash
+scripts/ctikz-tools-smoke.sh
+```
 
 ## Start the workflow
 

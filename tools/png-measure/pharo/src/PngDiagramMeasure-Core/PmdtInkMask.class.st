@@ -83,7 +83,7 @@ PmdtInkMask >> primaryBoundingBox [
 { #category : 'accessing' }
 PmdtInkMask >> boundingBoxForThreshold: aNumber [
 	^ self boundingBoxes
-		at: (PmdtCanonicalJson toString: aNumber) asString
+		at: (DsktCanonicalJson toString: aNumber) asString
 		ifAbsent: [ nil ]
 ]
 

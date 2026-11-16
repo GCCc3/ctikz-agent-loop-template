@@ -13,15 +13,11 @@ BaselineOfPngDiagramMeasure >> baseline: spec [
 	<baseline>
 	spec for: #common do: [
 		spec
-			baseline: 'NeoJSON' with: [
-				spec repository: 'github://svenvc/NeoJSON:master/repository' ];
-			baseline: 'Teapot' with: [
-				spec
-					repository: 'github://zeroflag/Teapot:master/source';
-					loads: #( 'Deployment' ) ].
+			baseline: 'Dskt' with: [
+				spec repository: 'tonel://' , (FileSystem workingDirectory / 'tools' / 'dskt' / 'pharo' / 'src') pathString ].
 		spec
 			package: 'PngDiagramMeasure-Core' with: [
-				spec requires: #( 'NeoJSON' 'Teapot' ) ];
+				spec requires: #( 'Dskt' ) ];
 			package: 'PngDiagramMeasure-Tests' with: [
 				spec requires: #( 'PngDiagramMeasure-Core' ) ].
 		spec

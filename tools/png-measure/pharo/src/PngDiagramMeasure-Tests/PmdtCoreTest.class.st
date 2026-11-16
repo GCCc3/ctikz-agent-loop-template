@@ -30,7 +30,7 @@ PmdtCoreTest >> testCanonicalJsonSortsAndFormats [
 		at: 'a' put: nil;
 		at: 'c' put: #(true false);
 		yourself.
-	json := PmdtCanonicalJson toString: dictionary.
+	json := DsktCanonicalJson toString: dictionary.
 	self assert: json equals: '{"a":null,"b":1.5,"c":[true,false]}'
 ]
 
@@ -44,5 +44,5 @@ PmdtCoreTest >> testMaskParametersThresholds [
 		yourself).
 	self assert: parameters thresholds asArray equals: #(0.25 0.5 0.75).
 	self assert: parameters backgroundRgb asArray equals: #(255 255 255).
-	self should: [ PmdtMaskParameters fromDictionary: (Dictionary new at: 'threshold' put: 1.5; yourself) ] raise: PmdtError
+	self should: [ PmdtMaskParameters fromDictionary: (Dictionary new at: 'threshold' put: 1.5; yourself) ] raise: DsktError
 ]

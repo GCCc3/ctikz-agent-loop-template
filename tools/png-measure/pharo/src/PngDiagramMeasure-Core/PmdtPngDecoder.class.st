@@ -16,7 +16,7 @@ PmdtPngDecoder class >> decodeFile: aPath [
 	| bytes sha |
 	bytes := [ aPath asFileReference binaryReadStreamDo: [ :stream | stream upToEnd ] ]
 		on: Error
-		do: [ :error | PmdtError code: 'image_not_found' message: 'Cannot read image: ' , aPath printString ].
+		do: [ :error | DsktError code: 'image_not_found' message: 'Cannot read image: ' , aPath printString ].
 	sha := (SHA256 hashMessage: bytes) hex.
 	^ self decodeBytes: bytes sha256: sha
 ]
@@ -25,7 +25,7 @@ PmdtPngDecoder class >> decodeFile: aPath [
 PmdtPngDecoder class >> decodeBytes: bytes sha256: aString [
 	| position header idat palette transparency physUnit physX physY sawIhdr sawIend |
 	(bytes size < 8 or: [ (bytes copyFrom: 1 to: 8) ~= #(137 80 78 71 13 10 26 10) asByteArray ])
-		ifTrue: [ PmdtError code: 'not_a_png' message: 'The file does not have a PNG signature' ].
+		ifTrue: [ DsktError code: 'not_a_png' message: 'The file does not have a PNG signature' ].
 	position := 9.
 	idat := OrderedCollection new.
 	sawIhdr := false.
@@ -34,19 +34,19 @@ PmdtPngDecoder class >> decodeBytes: bytes sha256: aString [
 		| length type dataStart data end crc computed |
 		length := self uint32At: position in: bytes.
 		(position + 11) > bytes size
-			ifTrue: [ PmdtError code: 'truncated_png' message: 'PNG chunk header is truncated' ].
+			ifTrue: [ DsktError code: 'truncated_png' message: 'PNG chunk header is truncated' ].
 		type := (bytes copyFrom: position + 4 to: position + 7) asString.
 		dataStart := position + 8.
 		end := dataStart + length - 1.
 		end > bytes size
-			ifTrue: [ PmdtError code: 'truncated_png' message: 'PNG chunk data is truncated' ].
+			ifTrue: [ DsktError code: 'truncated_png' message: 'PNG chunk data is truncated' ].
 		(end + 4) > bytes size
-			ifTrue: [ PmdtError code: 'truncated_png' message: 'PNG chunk CRC is truncated' ].
+			ifTrue: [ DsktError code: 'truncated_png' message: 'PNG chunk CRC is truncated' ].
 		data := bytes copyFrom: dataStart to: end.
 		crc := self uint32At: end + 1 in: bytes.
 		computed := CRC crc32FromCollection: (bytes copyFrom: position + 4 to: end).
 		crc = computed
-			ifFalse: [ PmdtError code: 'crc_mismatch' message: 'PNG chunk CRC mismatch for ' , type ].
+			ifFalse: [ DsktError code: 'crc_mismatch' message: 'PNG chunk CRC mismatch for ' , type ].
 		type = 'IHDR' ifTrue: [
 			sawIhdr := true.
 			header := self decodeHeader: data ].
@@ -54,7 +54,7 @@ PmdtPngDecoder class >> decodeBytes: bytes sha256: aString [
 		type = 'tRNS' ifTrue: [ transparency := data ].
 		type = 'pHYs' ifTrue: [
 			(length ~= 9)
-				ifTrue: [ PmdtError code: 'invalid_chunk' message: 'pHYs must contain nine bytes' ].
+				ifTrue: [ DsktError code: 'invalid_chunk' message: 'pHYs must contain nine bytes' ].
 			physX := self uint32At: 1 in: data.
 			physY := self uint32At: 5 in: data.
 			physUnit := data at: 9 ].
@@ -63,13 +63,13 @@ PmdtPngDecoder class >> decodeBytes: bytes sha256: aString [
 		(self isCritical: type)
 			ifTrue: [
 				(#('IHDR' 'PLTE' 'IDAT' 'IEND') includes: type)
-					ifFalse: [ PmdtError code: 'invalid_chunk' message: 'Unknown critical PNG chunk: ' , type ] ].
+					ifFalse: [ DsktError code: 'invalid_chunk' message: 'Unknown critical PNG chunk: ' , type ] ].
 		position := end + 5.
 		sawIend ifTrue: [ position := bytes size + 1 ] ].
 	sawIhdr
-		ifFalse: [ PmdtError code: 'truncated_png' message: 'PNG has no IHDR chunk' ].
+		ifFalse: [ DsktError code: 'truncated_png' message: 'PNG has no IHDR chunk' ].
 	sawIend
-		ifFalse: [ PmdtError code: 'truncated_png' message: 'PNG has no IEND chunk' ].
+		ifFalse: [ DsktError code: 'truncated_png' message: 'PNG has no IEND chunk' ].
 	header
 		palette: palette;
 		transparency: transparency;
@@ -83,7 +83,7 @@ PmdtPngDecoder class >> decodeBytes: bytes sha256: aString [
 PmdtPngDecoder class >> decodeHeader: data [
 	| width height bitDepth colorType compression filter interlace |
 	data size = 13
-		ifFalse: [ PmdtError code: 'invalid_chunk' message: 'IHDR must contain thirteen bytes' ].
+		ifFalse: [ DsktError code: 'invalid_chunk' message: 'IHDR must contain thirteen bytes' ].
 	width := self uint32At: 1 in: data.
 	height := self uint32At: 5 in: data.
 	bitDepth := data at: 9.
@@ -92,17 +92,17 @@ PmdtPngDecoder class >> decodeHeader: data [
 	filter := data at: 12.
 	interlace := data at: 13.
 	(width > 0 and: [ height > 0 ])
-		ifFalse: [ PmdtError code: 'invalid_chunk' message: 'PNG dimensions must be positive' ].
+		ifFalse: [ DsktError code: 'invalid_chunk' message: 'PNG dimensions must be positive' ].
 	bitDepth = 8
-		ifFalse: [ PmdtError code: 'unsupported_bit_depth' message: 'Only 8-bit PNGs are supported' ].
+		ifFalse: [ DsktError code: 'unsupported_bit_depth' message: 'Only 8-bit PNGs are supported' ].
 	(#(0 2 3 4 6) includes: colorType)
-		ifFalse: [ PmdtError code: 'unsupported_color_type' message: 'Unsupported PNG colour type' ].
+		ifFalse: [ DsktError code: 'unsupported_color_type' message: 'Unsupported PNG colour type' ].
 	compression = 0
-		ifFalse: [ PmdtError code: 'unsupported_color_type' message: 'Unsupported PNG compression method' ].
+		ifFalse: [ DsktError code: 'unsupported_color_type' message: 'Unsupported PNG compression method' ].
 	filter = 0
-		ifFalse: [ PmdtError code: 'unsupported_color_type' message: 'Unsupported PNG filter method' ].
+		ifFalse: [ DsktError code: 'unsupported_color_type' message: 'Unsupported PNG filter method' ].
 	interlace = 0
-		ifFalse: [ PmdtError code: 'unsupported_interlace' message: 'Adam7 interlacing is not supported' ].
+		ifFalse: [ DsktError code: 'unsupported_interlace' message: 'Adam7 interlacing is not supported' ].
 	^ PmdtPngHeader
 		width: width
 		height: height
@@ -115,7 +115,7 @@ PmdtPngDecoder class >> decodeHeader: data [
 PmdtPngDecoder class >> decodePalette: data [
 	| entries |
 	(data size \\ 3) = 0
-		ifFalse: [ PmdtError code: 'invalid_chunk' message: 'PLTE length must be a multiple of three' ].
+		ifFalse: [ DsktError code: 'invalid_chunk' message: 'PLTE length must be a multiple of three' ].
 	entries := Array new: data size // 3.
 	1 to: entries size do: [ :i |
 		| base |
@@ -128,18 +128,18 @@ PmdtPngDecoder class >> decodePalette: data [
 PmdtPngDecoder class >> decodeImage: bytes header: header idat: idat sha256: aString [
 	| raw rowBytes expected filterBytes decoded rgba channels bpp |
 	idat isEmpty
-		ifTrue: [ PmdtError code: 'truncated_png' message: 'PNG contains no IDAT data' ].
+		ifTrue: [ DsktError code: 'truncated_png' message: 'PNG contains no IDAT data' ].
 	channels := self channelsForColorType: header colorType.
 	bpp := channels.
 	rowBytes := header width * channels.
 	expected := header height * (rowBytes + 1).
 	raw := [ (ZLibReadStream on: (self concatenate: idat)) upToEnd ]
 		on: Error
-		do: [ :error | PmdtError code: 'decompression_failed' message: 'PNG IDAT decompression failed' ].
+		do: [ :error | DsktError code: 'decompression_failed' message: 'PNG IDAT decompression failed' ].
 	raw size < expected
-		ifTrue: [ PmdtError code: 'decompression_failed' message: 'PNG IDAT data is shorter than expected' ].
+		ifTrue: [ DsktError code: 'decompression_failed' message: 'PNG IDAT data is shorter than expected' ].
 	raw size > expected
-		ifTrue: [ PmdtError code: 'trailing_idat_data' message: 'PNG IDAT data is longer than expected' ].
+		ifTrue: [ DsktError code: 'trailing_idat_data' message: 'PNG IDAT data is longer than expected' ].
 	decoded := self unfilter: raw width: header width height: header height bpp: bpp rowBytes: rowBytes.
 	rgba := self expand: decoded header: header width: header width height: header height.
 	^ PmdtRgbaImage
@@ -175,7 +175,7 @@ PmdtPngDecoder class >> unfilter: raw width: width height: height bpp: bpp rowBy
 				predictor := self paethLeft: left above: up upperLeft: upperLeft.
 				value := rawValue + predictor ].
 			filter > 4
-				ifTrue: [ PmdtError code: 'invalid_chunk' message: 'Unsupported PNG filter type' ].
+				ifTrue: [ DsktError code: 'invalid_chunk' message: 'Unsupported PNG filter type' ].
 			output at: target + i - 1 put: (value bitAnd: 255) ].
 		previous := output copyFrom: target to: target + rowBytes - 1 ].
 	^ output
@@ -214,7 +214,7 @@ PmdtPngDecoder class >> expand: decoded header: header width: width height: heig
 				| paletteIndex entry |
 				paletteIndex := (decoded at: source) + 1.
 				entry := header palette at: paletteIndex ifAbsent: [ nil ].
-				entry ifNil: [ PmdtError code: 'invalid_chunk' message: 'Palette index is out of range' ].
+				entry ifNil: [ DsktError code: 'invalid_chunk' message: 'Palette index is out of range' ].
 				r := entry at: 1.
 				g := entry at: 2.
 				b := entry at: 3.
@@ -245,7 +245,7 @@ PmdtPngDecoder class >> channelsForColorType: aNumber [
 	aNumber = 3 ifTrue: [ ^ 1 ].
 	aNumber = 4 ifTrue: [ ^ 2 ].
 	aNumber = 6 ifTrue: [ ^ 4 ].
-	PmdtError code: 'unsupported_color_type' message: 'Unsupported PNG colour type'
+	DsktError code: 'unsupported_color_type' message: 'Unsupported PNG colour type'
 ]
 
 { #category : 'private' }

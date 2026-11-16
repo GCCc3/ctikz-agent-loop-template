@@ -1,6 +1,6 @@
 # CircuitTikZ snippet catalog and source lint — implementation plan
 
-Status: proposal (not implemented).
+Status: implemented. See `workflow/circuitikz_tools_completion_plan.md` for the completion work and verification.
 
 Implements tool proposals 2 and 3 from `analysis/efficiency-through-003.md`, with the final catalog design agreed in conversation:
 
@@ -12,7 +12,7 @@ Implements tool proposals 2 and 3 from `analysis/efficiency-through-003.md`, wit
 - both tools use the common **Domain Specific Toolkit (`Dskt`)**, extracted from the existing PNG measurement server, as the MCP/HTTP/image infrastructure;
 - the `Dskt` layer has no dependency on PNG, CircuitTikZ, or any other domain package.
 
-Tool proposal 1 (`measure_diagram_geometry`) is already implemented as `png-diagram-measure`; this plan does not modify it.
+Tool proposal 1 (`measure_diagram_geometry`) is already implemented as `png-diagram-measure`; this plan does not change its measurement behavior. It does refactor its integration: the PNG domain registers directly on `DsktServer`, `PmdtServer` is removed, and `PDMT_*` fallbacks are removed.
 
 ## 1. Decisions
 
@@ -21,6 +21,8 @@ Tool proposal 1 (`measure_diagram_geometry`) is already implemented as `png-diag
 | Where the work happens | Catalog, Mustache rendering, source scanning, and lint rules run in the Pharo image. The MCP process is a transport shim only. | Keeps one implementation of each rule and lets the image hold the editable catalog. |
 | Server | Common `DsktServer` on `DSKT_PORT` (default 8087), with domain route providers for `/png/*` and `/ctikz/*`. No second Pharo process or port. | One lifecycle, one trace, one health surface; domains remain independently registerable. |
 | Pharo packages | `Dskt-Core` for common infrastructure; `PngDiagramMeasure-Core` for the existing PNG domain; `Ctikz-Core` for the new catalog/lint domain. | Enforces the rule that `Dskt` imports no domain package; domains depend on `Dskt`. |
+| PNG integration | `PngMeasureRouteProvider` registers `/png/*` directly on `DsktServer`; `PmdtServer` is removed. | Same integration model as every other domain; no deprecated facade. |
+| Environment | `DSKT_*` for common settings; `PNG_*` for PNG-specific settings. No `PDMT_*` fallback. | Hard cutover; no legacy variable aliases. |
 | MCP surface | One `dskt-mcp-server` with domain modules; it exposes `png_*`, `ctikz_*`, `dskt_health`, and `dskt_trace`. `DSKT_MODULES` and `DSKT_TOOLS` filter what each process registers. | The MCP shim is common infrastructure, not a PNG-specific package; a filtered process can expose only one agent's tools. |
 | Naming | Common packages/classes use the `Dskt` prefix (`DsktServer`, `DsktSettings`, `DsktToolTrace`, `DsktError`). Domain classes keep `PngMeasure` or `Ctikz`. | Keeps the shared layer identifiable and prevents domain names from leaking into the toolkit. |
 | Catalog shape | Snippets, not documents. Each renders one construct with abstract parameters. | The agent decides composition; the image does not assume a target diagram. |
@@ -92,7 +94,8 @@ tools/png-measure/pharo/src/
 ├── PngDiagramMeasure-Core/            # existing PNG domain
 │   ├── PngMeasureService.class.st
 │   ├── PngMeasureRouteProvider.class.st
-│   └── ...                            # existing Pmdt domain classes
+│   ├── PngMeasureSettings.class.st
+│   └── ...                            # existing PNG measurement classes
 └── PngDiagramMeasure-Tests/
 
 tools/circuitikz-tools/pharo/src/
@@ -137,22 +140,24 @@ If the image does not already provide Mustache, declare the Pharo Mustache packa
 | `DsktServer` | Common Teapot lifecycle, startup registration, envelope dispatch, route registry, and error handling. Holds no domain classes. |
 | `DsktRouteProvider` | Protocol for a domain package: `installRoutesOn: teapot`, `health`, and `name`. |
 | `DsktRouteRegistry` | Ordered registry of providers; installs routes once; rejects duplicate route/prefix registration. |
-| `DsktSettings` | `DSKT_PORT`, `DSKT_HOST`, `DSKT_REPO_ROOT`, `DSKT_TRACE_LOG`, `DSKT_DEBUG`; no PNG or Ctikz settings. |
+| `DsktSettings` | `DSKT_PORT`, `DSKT_HOST`, `DSKT_REPO_ROOT`, `DSKT_TRACE_LOG`, `DSKT_CLIENT_ROLE`, `DSKT_DEBUG`; no PNG or Ctikz settings. |
 | `DsktError` | Generic `code`, `message`, `details`; domain error codes remain domain-owned. |
 | `DsktCanonicalJson` | Sorted keys, fixed float formatting, UTF-8/LF output. |
 | `DsktToolTrace` | Wraps one route dispatch, measures duration, emits one `DsktToolCallSignal`, re-raises the original error. |
 | `DsktToolCallSignal` | Generic Beacon signal with optional domain `details`; no `image_path`-only fields. |
 | `DsktTraceLogger` | Bounded ring and JSONL sink; registered for `DsktToolCallSignal` only. |
 | `DsktVersion` | Common `schemaVersion` and toolkit `toolVersion`. |
-| `PngMeasureRouteProvider` | Existing PNG domain: installs `/png/*` routes and reports PNG health. |
+| `PngMeasureRouteProvider` | Existing PNG domain: installs `/png/*` directly on `DsktServer` and reports PNG health. |
+| `PngMeasureService` | Existing PNG measurement facade; measurement logic unchanged; errors use `DsktError`. |
+| `PngMeasureSettings` | `PNG_OUTPUT_ROOT`, `PNG_MAX_PIXELS`, mask and cache settings; no common settings. |
 | `CtikzRouteProvider` | New domain: installs `/ctikz/*` routes and reports catalog/lint health. |
 | `CtikzSnippet` | Immutable entry: `id`, `title`, `kind`, `tags`, `description`, `mustacheSource`, `parameterSchema`, `presetParameters`, `requires`, `provides`, `version`, `checksum`. |
 | `CtikzSnippetParameter` | Name, type (`string`, `number`, `boolean`, `array`), required flag, default, enum, description. |
 | `CtikzSnippetCatalog` | Singleton. Loads snippets from class-side methods in protocol `snippets`, validates uniqueness and component compatibility, computes `catalogVersion`, supports search and `reset`. |
 | `CtikzSnippetRenderer` | Merges presets and caller parameters, builds the Mustache view model, renders, rejects unknown placeholders, returns source and warnings. |
 | `CtikzSnippetValidator` | Load-time and render-time validation: schema, unknown parameters, unresolved `{{...}}`, balanced braces, no target-specific defaults, component existence. |
-| `CtikzComponentInfo` | Installed CircuitTikZ version, component/style key, declaration `file:line`, aliases, default length/height, style defaults. |
-| `CtikzComponentLookup` | Resolves component/style keys against the installed TeX Live tree and returns matching snippet ids. |
+| `CtikzComponentInfo` | Installed CircuitTikZ version, component/style key, human-readable `description` (for example "inductor" for `L`), declaration `file:line`, aliases, default length/height, style defaults. |
+| `CtikzComponentLookup` | Resolves component/style keys against the installed TeX Live tree and returns `CtikzComponentInfo` including `description` and matching snippet ids. |
 | `CtikzCatalogService` | Facade for list/get/render/lookup; converts errors to `DsktError`; contains no tracing. |
 | `CtikzSourceScanner` | Comment-aware lexical/structural scan of TeX; produces `CtikzSourceModel`. |
 | `CtikzSourceModel` | Document class/options, packages, libraries, environments, brace balance, coordinates defined/referenced, components, labels, forbidden matches, line map. |
@@ -161,13 +166,13 @@ If the image does not already provide Mustache, declare the Pharo Mustache packa
 | `CtikzLintReport` | Deterministic ordered checks, counts, summary, source SHA-256. |
 | `CtikzLintService` | Facade for `lintSource:`; no tracing. |
 
-### 3.1 Migration from `PmdtServer`
+### 3.1 PNG integration refactor (hard cutover)
 
-- `PmdtServer` becomes a deprecated facade that delegates lifecycle and dispatch to `DsktServer`; existing PNG startup registration continues to work during migration.
-- `PmdtSettings` is split: common values move to `DsktSettings` (`DSKT_PORT`, `DSKT_HOST`, `DSKT_REPO_ROOT`, `DSKT_TRACE_LOG`, `DSKT_DEBUG`); PNG-specific values remain in `PngMeasureSettings`.
-- `PDMT_*` environment variables are accepted as fallbacks for `DSKT_*` until scripts and `.omp/mcp.json` are updated. New code uses `DSKT_*`.
-- `/png/health` and `/png/trace` remain aliases for the common `/health` and `/trace`; `/ctikz/health` remains a domain alias.
-- The migration removes no PNG route and changes no measurement result. Compatibility aliases are deleted only after all callers use `Dskt` names.
+- `PmdtServer` is deleted. `PngMeasureRouteProvider` registers `/png/*` directly on `DsktServer`; `DsktServer` owns startup registration, dispatch, and shutdown.
+- `PmdtSettings` is split: common values move to `DsktSettings` (`DSKT_PORT`, `DSKT_HOST`, `DSKT_REPO_ROOT`, `DSKT_TRACE_LOG`, `DSKT_CLIENT_ROLE`, `DSKT_DEBUG`); PNG-specific values move to `PngMeasureSettings` (`PNG_OUTPUT_ROOT`, `PNG_MAX_PIXELS`, and mask/cache settings).
+- `PDMT_*` variables are not read. All scripts, `.omp/mcp.json`, README, and tests use `DSKT_*` and `PNG_*`. There is no fallback path and no deprecation period.
+- `/png/health` and `/png/trace` remain domain aliases for the common `/health` and `/trace`; `/ctikz/health` remains a domain alias. These are route aliases only, not class aliases.
+- The refactor changes no PNG route and no measurement result. All callers are updated in the same change; there is no `PmdtServer` compatibility facade to remove later.
 
 ### 3.2 Future tools and selective loading
 
@@ -260,7 +265,7 @@ The renderer pre-scans the source for `{{...}}` names and rejects any name not p
 | `GET /ctikz/snippets` | `q`, `tag`, `component`, `kind` (all optional) | `snippets: [...]`, `catalog_version` |
 | `GET /ctikz/snippets/{id}` | — | `snippet`, `catalog_version` |
 | `POST /ctikz/render_snippet` | `{snippet_id, parameters}` | `snippet_id`, `version`, `parameters`, `source`, `warnings`, `checksum` |
-| `POST /ctikz/components` | `{component, detail?}` | component metadata, declaration/defaults, `snippet_ids` |
+| `POST /ctikz/components` | `{component, detail?}` | `description`, component metadata, declaration/defaults, `snippet_ids` |
 
 `render_snippet` merges catalog defaults, preset parameters, and caller parameters. Unknown or missing required parameters are errors. The result is a snippet, not a document; it does not include `\begin{document}` or `\end{document}`.
 
@@ -279,7 +284,7 @@ Example:
            "warnings":[],"checksum":"..."}}
 ```
 
-MCP tools: `ctikz_list_snippets`, `ctikz_get_snippet`, `ctikz_render_snippet`, `ctikz_lookup_component`.
+MCP tools: `ctikz_list_snippets`, `ctikz_get_snippet`, `ctikz_render_snippet`, `ctikz_lookup_component`. `ctikz_lookup_component` returns `CtikzComponentInfo` with the human-readable `description` so the agent can identify `component/L` as an inductor.
 
 ## 5. Tool B — CircuitTikZ source lint
 
@@ -427,7 +432,7 @@ Deliver `Dskt-Core`: `DsktServer`, `DsktRouteProvider`, `DsktRouteRegistry`, `Ds
 
 Deliver the `Ctikz-Core` skeleton: `CtikzSnippet`, `CtikzSnippetParameter`, `CtikzSnippetCatalog`, `CtikzSnippetRenderer`, `CtikzSnippetValidator`, `CtikzSourceScanner`, `CtikzLintRule`/`CtikzLintCheck`/`CtikzLintReport`, and `CtikzRouteProvider`.
 
-Acceptance: `Dskt-Core` loads and tests with no domain package; a dummy provider can register a route without editing `DsktServer`; existing PNG tests remain green; `/health` reports both providers; no new port.
+Acceptance: `Dskt-Core` loads and tests with no domain package; a dummy provider can register a route without editing `DsktServer`; existing PNG measurement tests remain green after updating their environment variables to `DSKT_*`/`PNG_*`; `/health` reports both providers; no new port; `PmdtServer` and `PDMT_*` references are removed; PNG routes register directly through `PngMeasureRouteProvider`.
 
 ### Phase 1 — catalog
 
@@ -486,6 +491,10 @@ Acceptance: no crashes; errors use the declared codes; repeated startup does not
 | Target-specific token in id/tag/default label | catalog load failure |
 | Render twice | Identical source and checksum |
 | Lookup `sV` | Returns component metadata and `component/sV` snippet id |
+| Lookup `L` | Returns `description: "inductor"` and `component/L` snippet id |
+| Lookup `R` | Returns `description: "resistor"` and `component/R` snippet id |
+| Lookup `generic` | Returns `description: "generic bipole"` and `component/generic` snippet id |
+| Lookup `sV` | Returns `description: "independent voltage source"` and `component/sV` snippet id |
 | Lookup unknown component | `found:false` with suggestions, not an error |
 
 ### 8.2 Lint scanner tests
@@ -530,6 +539,8 @@ Acceptance: no crashes; errors use the declared codes; repeated startup does not
 | `source_text` | Exact text accepted; oversize rejected; both `path` and `source_text` rejected |
 | Trace | One line per render/lookup/lint; health/listing untraced; `check_counts` correct; no effect on result bytes |
 | Lifecycle | Load into saved image; reboot starts same server; no duplicate `/ctikz` routes; catalog survives snapshot |
+| Clean cutover | Repository scan finds no `PmdtServer` class, no `PDMT_*` variable, and no compatibility facade; PNG registers via `PngMeasureRouteProvider` |
+| Description lookup | `L` → "inductor", `R` → "resistor", `generic` → "generic bipole", `sV` → "independent voltage source" |
 | Determinism | Two identical lint calls produce identical JSON bytes; two identical renders produce identical checksum |
 | Concurrency | Parallel render/lint requests do not corrupt catalog state or trace lines |
 
@@ -547,7 +558,7 @@ Acceptance: the full sequence works through MCP with Bash and `eval` denied; gen
 
 ## 9. Workflow integration
 
-- Add `dskt-mcp-server` to `.omp/mcp.json` with `DSKT_PORT` and `DSKT_REPO_ROOT`; keep the PNG tool names available through the `png` module.
+- Add `dskt-mcp-server` to `.omp/mcp.json` with `DSKT_PORT`, `DSKT_HOST`, `DSKT_REPO_ROOT`, `DSKT_TRACE_LOG`, and PNG-specific `PNG_*` settings; keep the PNG tool names available through the `png` module. Do not keep `PDMT_*` entries.
 - Update `.omp/agents/diagram-generator.md`: use `ctikz_list_snippets` / `ctikz_render_snippet` when a construct is needed; use `ctikz_lint_source` on the candidate source before writing the result.
 - Update `.omp/agents/diagram-reviewer.md`: use `ctikz_lookup_component` for symbol/style facts and `ctikz_lint_source` for structural claims; do not infer visual fidelity from lint.
 - Do not add a skill that tells agents to generate a whole document from the catalog. The catalog is a lookup library.
@@ -568,11 +579,13 @@ Acceptance: the full sequence works through MCP with Bash and `eval` denied; gen
 10. Source paths cannot escape `DSKT_REPO_ROOT`; `source_text` and file sizes are capped; no tool writes files.
 11. Catalog and lint results are canonical JSON with deterministic checksums; trace does not alter results.
 12. The image can be installed, snapshotted, rebooted, and still serves `/health` and `/ctikz/health` without a manual `eval`.
-13. Existing PNG measurement tests and endpoints remain green.
+13. Existing PNG measurement tests remain green after updating their environment variables to `DSKT_*`/`PNG_*`; PNG endpoints are unchanged.
 14. `tree-sitter` is not used; `CtikzSourceScanner` is the only TeX parser.
 15. `Dskt-Core` compiles and tests with no domain packages loaded; adding or removing a domain provider does not require editing `DsktServer`.
 16. A future domain can be added by a new `DsktRouteProvider` plus `DsktToolModule`; no existing domain or core server edit is required.
 17. `DSKT_MODULES`/`DSKT_TOOLS` and agent tool allowlists can restrict an agent to exactly the MCP tools it needs.
+18. No `PmdtServer` class, facade, or `PDMT_*` environment variable remains; PNG routes register through `PngMeasureRouteProvider`, and all scripts/config/tests use `DSKT_*`/`PNG_*`.
+19. `CtikzComponentInfo` exposes `description`; lookup of `L`, `R`, `generic`, and `sV` returns the semantic description and the matching snippet id.
 
 ## 11. Deferred
 
@@ -587,7 +600,7 @@ Acceptance: the full sequence works through MCP with Bash and `eval` denied; gen
 ## 12. Grounding evidence
 
 - `analysis/efficiency-through-003.md` proposes `lookup_circuitikz_component` (P3) and `lint_reconstruction_tex` (P4/P5), with expected savings and listed risks.
-- `workflow/png_diagram_measurement_tool_implementation_plan.md` establishes the existing `PmdtServer`/Teapot, MCP shim, canonical JSON, trace, and lifecycle pattern. This plan extracts the domain-independent parts into `Dskt-Core`; `PmdtServer` becomes a compatibility facade during migration.
+- `workflow/png_diagram_measurement_tool_implementation_plan.md` establishes the existing `PmdtServer`/Teapot, MCP shim, canonical JSON, trace, and lifecycle pattern. This plan extracts the domain-independent parts into `Dskt-Core`; `PmdtServer` is deleted and its route installation moves into `PngMeasureRouteProvider`.
 - The existing `PmdtServer>>installRoutes` method shows the route style (`GET:`, `POST:`, `handleOperation:selector:request:`). `DsktServer` replaces the hardcoded route list with `DsktRouteRegistry` and domain `DsktRouteProvider`s.
 - `current/reconstruction.tex` is the lint golden source: one `circuitikz` environment, `standalone` without `tikz`, no image inclusion, the default labels, defined coordinates, and `to[L]`/`to[R]`/`to[generic]`/`to[sV]`.
 - No tree-sitter dependency exists in the repository; the Pharo grammar would parse Smalltalk, not TeX.

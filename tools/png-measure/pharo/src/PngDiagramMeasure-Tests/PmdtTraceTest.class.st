@@ -11,13 +11,15 @@ Class {
 { #category : 'tests' }
 PmdtTraceTest >> testSignalDictionary [
 	| signal dictionary |
-	signal := PmdtToolCallSignal new
+	signal := DsktToolCallSignal new
 		tool: 'png_measure_bounds';
 		outcome: 'ok_with_warnings';
 		warningCodes: #('bbox_unstable');
 		durationMs: 12;
-		imagePath: 'reference/target.png';
-		imageSha256: 'abc';
+		details: (Dictionary new
+			at: 'image_path' put: 'reference/target.png';
+			at: 'image_sha256' put: 'abc';
+			yourself);
 		requestId: 'r1';
 		clientId: 'c1';
 		clientRole: 'reviewer';
@@ -28,19 +30,21 @@ PmdtTraceTest >> testSignalDictionary [
 	self assert: (dictionary at: 'outcome') equals: 'ok_with_warnings'.
 	self assert: (dictionary at: 'warning_codes') equals: #('bbox_unstable').
 	self assert: (dictionary at: 'schema_version') equals: 1.
+	self assert: (dictionary at: 'result_bytes') equals: 42.
+	self assert: ((dictionary at: 'details') at: 'image_path') equals: 'reference/target.png'.
 	self assert: (dictionary at: 'timestamp') isString
 ]
 
 { #category : 'tests' }
 PmdtTraceTest >> testReportCounts [
 	| logger report signals |
-	logger := PmdtTraceLogger new.
+	logger := DsktTraceLogger new.
 	signals := {
-		PmdtToolCallSignal new tool: 'png_inspect_image'; outcome: 'ok'; warningCodes: #(); sequence: 1; clientId: 'c1'; yourself.
-		PmdtToolCallSignal new tool: 'png_measure_bounds'; outcome: 'ok_with_warnings'; warningCodes: #('bbox_unstable'); sequence: 2; clientId: 'c1'; yourself.
-		PmdtToolCallSignal new tool: 'png_measure_bounds'; outcome: 'error'; errorCode: 'invalid_request'; warningCodes: #(); sequence: 3; clientId: 'c2'; yourself }.
+		DsktToolCallSignal new tool: 'png_inspect_image'; outcome: 'ok'; warningCodes: #(); sequence: 1; clientId: 'c1'; yourself.
+		DsktToolCallSignal new tool: 'png_measure_bounds'; outcome: 'ok_with_warnings'; warningCodes: #('bbox_unstable'); sequence: 2; clientId: 'c1'; yourself.
+		DsktToolCallSignal new tool: 'png_measure_bounds'; outcome: 'error'; errorCode: 'invalid_request'; warningCodes: #(); sequence: 3; clientId: 'c2'; yourself }.
 	signals do: [ :signal | logger entries add: signal ].
-	report := PmdtTraceReport from: logger limit: 2 sinceSequence: nil tool: nil clientId: nil.
+	report := DsktTraceReport from: logger limit: 2 sinceSequence: nil tool: nil clientId: nil.
 	self assert: ((report at: 'counts') at: 'total') equals: 3.
 	self assert: (((report at: 'counts') at: 'by_tool') at: 'png_measure_bounds') equals: 2.
 	self assert: (((report at: 'counts') at: 'by_outcome') at: 'ok') equals: 1.

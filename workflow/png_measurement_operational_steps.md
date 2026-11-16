@@ -1,5 +1,9 @@
 # PNG Measurement Tool — Remaining Operational Steps
 
+> Historical: this document describes the pre-Dskt `PmdtServer` setup. The current
+> shared `DsktServer` setup is documented in `README.md`,
+> `tools/png-measure/README.md`, and `workflow/circuitikz_tools_completion_plan.md`.
+
 Status: the Pharo source, MCP shim, scripts, schemas, and skill are committed.
 The tool is **not yet operational** in this environment. The installed image
 lacks the classes, the service is not running, the baseline is not promoted, and
@@ -44,7 +48,7 @@ list, and snapshots. It must run against a stopped image.
 export PHARO=/home/codespace/moose13/pharo
 export PDMT_REPO_ROOT=/workspaces/ctikz-agent-loop-template
 export PDMT_BASE_IMAGE=/home/codespace/moose13/Pharo.image
-export PDMT_IMAGE=/workspaces/ctikz-agent-loop-template/tmp/png-measure/PngMeasure.image
+export PDMT_IMAGE=/workspaces/ctikz-agent-loop-template/tmp/dskt/DsktService.image
 export PDMT_PORT=8087
 export PDMT_HOST=127.0.0.1
 export PDMT_OUTPUT_ROOT=/workspaces/ctikz-agent-loop-template/tmp/png-measure
@@ -187,7 +191,7 @@ agent calls.
 ## 10. Operational hygiene
 
 - Stop the service before reinstalling: a running image cannot be reopened by a
-  second VM. `pgrep -f PngMeasure.image` must return nothing before
+  second VM. `pgrep -f DsktService.image` must return nothing before
   `scripts/png-measure-install.sh`.
 - Keep the trace log and baseline under `tmp/png-measure/` (gitignored).
   Do not commit absolute paths or trace data.

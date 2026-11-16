@@ -63,7 +63,7 @@ PmdtMaskParameters >> method [ ^ method ]
 { #category : 'accessing' }
 PmdtMaskParameters >> method: aString [
 	(aString asLowercase = 'luminance')
-		ifFalse: [ PmdtError code: 'invalid_request' message: 'Only the luminance mask method is supported' ].
+		ifFalse: [ DsktError code: 'invalid_request' message: 'Only the luminance mask method is supported' ].
 	method := 'luminance'
 ]
 
@@ -73,7 +73,7 @@ PmdtMaskParameters >> threshold [ ^ threshold ]
 { #category : 'accessing' }
 PmdtMaskParameters >> threshold: aNumber [
 	(aNumber isNumber and: [ aNumber > 0 and: [ aNumber < 1 ] ])
-		ifFalse: [ PmdtError code: 'invalid_request' message: 'The threshold must be between 0 and 1' ].
+		ifFalse: [ DsktError code: 'invalid_request' message: 'The threshold must be between 0 and 1' ].
 	threshold := aNumber asFloat
 ]
 
@@ -91,7 +91,7 @@ PmdtMaskParameters >> sensitivityThresholds: aCollection [
 	values := values asSet asSortedCollection: [ :a :b | a <= b ].
 	values := values asOrderedCollection.
 	values size > 9
-		ifTrue: [ PmdtError code: 'invalid_request' message: 'At most nine sensitivity thresholds are supported' ].
+		ifTrue: [ DsktError code: 'invalid_request' message: 'At most nine sensitivity thresholds are supported' ].
 	sensitivityThresholds := values
 ]
 
@@ -128,7 +128,7 @@ PmdtMaskParameters >> parseBackground: aString [
 	| text red green blue |
 	text := aString asString trimBoth.
 	(text size = 7 and: [ text first = $# ])
-		ifFalse: [ PmdtError code: 'invalid_request' message: 'The background must be #rrggbb' ].
+		ifFalse: [ DsktError code: 'invalid_request' message: 'The background must be #rrggbb' ].
 	red := Integer readFrom: (text copyFrom: 2 to: 3) base: 16.
 	green := Integer readFrom: (text copyFrom: 4 to: 5) base: 16.
 	blue := Integer readFrom: (text copyFrom: 6 to: 7) base: 16.

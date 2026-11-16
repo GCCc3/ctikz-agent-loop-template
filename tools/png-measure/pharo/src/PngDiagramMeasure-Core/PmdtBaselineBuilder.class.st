@@ -12,8 +12,8 @@ Class {
 PmdtBaselineBuilder class >> buildImage: aPmdtRgbaImage path: aPath parameters: aPmdtMaskParameters mask: aPmdtInkMask bounds: bounds regions: regions regionUnits: aString warnings: warnings [
 	| document |
 	document := Dictionary new
-		at: 'schema_version' put: PmdtVersion schemaVersion;
-		at: 'tool_version' put: PmdtVersion toolVersion;
+		at: 'schema_version' put: DsktVersion schemaVersion;
+		at: 'tool_version' put: DsktVersion toolVersion;
 		at: 'image' put: (Dictionary new
 			at: 'path' put: aPath;
 			at: 'sha256' put: aPmdtRgbaImage sha256;
@@ -49,7 +49,7 @@ PmdtBaselineBuilder class >> boxesDictionary: aDictionary [
 PmdtBaselineBuilder class >> withHash: aDictionary [
 	| document hash |
 	document := aDictionary copy.
-	hash := (SHA256 hashMessage: (PmdtCanonicalJson toString: document) asByteArray) hex.
+	hash := (SHA256 hashMessage: (DsktCanonicalJson toString: document) asByteArray) hex.
 	document at: 'baseline_sha256' put: hash.
 	^ document
 ]

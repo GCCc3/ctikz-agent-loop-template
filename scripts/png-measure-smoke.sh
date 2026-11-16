@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="${PDMT_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-PDMT_PORT="${PDMT_PORT:-8087}"
-PDMT_HOST="${PDMT_HOST:-127.0.0.1}"
-PDMT_OUTPUT_ROOT="${PDMT_OUTPUT_ROOT:-$REPO_ROOT/tmp/png-measure}"
-BASE_URL="http://$PDMT_HOST:$PDMT_PORT"
+REPO_ROOT="${DSKT_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+DSKT_PORT="${DSKT_PORT:-8087}"
+DSKT_HOST="${DSKT_HOST:-127.0.0.1}"
+PNG_OUTPUT_ROOT="${PNG_OUTPUT_ROOT:-$REPO_ROOT/tmp/png-measure}"
+BASE_URL="http://$DSKT_HOST:$DSKT_PORT"
 TARGET="$REPO_ROOT/reference/target.png"
 TARGET_ABS="$(realpath "$TARGET")"
 
@@ -18,9 +18,9 @@ request_post() {
   local path="$1"
   local payload="$2"
   curl -sS -X POST -H 'Content-Type: application/json' \
-    -H "X-PDMT-Request-Id: smoke-$RANDOM-$RANDOM" \
-    -H "X-PDMT-Client-Id: smoke-client" \
-    -H "X-PDMT-Client-Role: reviewer" \
+    -H "X-DSKT-Request-Id: smoke-$RANDOM-$RANDOM" \
+    -H "X-DSKT-Client-Id: smoke-client" \
+    -H "X-DSKT-Client-Role: reviewer" \
     -d "$payload" "$BASE_URL$path"
 }
 
@@ -31,28 +31,28 @@ echo "inspect_image"
 request_post /png/inspect_image "{
   \"image_path\": \"reference/target.png\",
   \"image_abs_path\": \"$TARGET_ABS\",
-  \"output_root\": \"$PDMT_OUTPUT_ROOT\"
+  \"output_root\": \"$PNG_OUTPUT_ROOT\"
 }" | python_check "inspect_image"
 
 echo "make_ink_mask"
 request_post /png/make_ink_mask "{
   \"image_path\": \"reference/target.png\",
   \"image_abs_path\": \"$TARGET_ABS\",
-  \"output_root\": \"$PDMT_OUTPUT_ROOT\"
+  \"output_root\": \"$PNG_OUTPUT_ROOT\"
 }" | python_check "make_ink_mask"
 
 echo "measure_bounds"
 request_post /png/measure_bounds "{
   \"image_path\": \"reference/target.png\",
   \"image_abs_path\": \"$TARGET_ABS\",
-  \"output_root\": \"$PDMT_OUTPUT_ROOT\"
+  \"output_root\": \"$PNG_OUTPUT_ROOT\"
 }" | python_check "measure_bounds"
 
 echo "measure_regions"
 request_post /png/measure_regions "{
   \"image_path\": \"reference/target.png\",
   \"image_abs_path\": \"$TARGET_ABS\",
-  \"output_root\": \"$PDMT_OUTPUT_ROOT\",
+  \"output_root\": \"$PNG_OUTPUT_ROOT\",
   \"regions\": {\"frame\": [0.1, 0.1, 0.9, 0.9]},
   \"region_units\": \"normalized_image\"
 }" | python_check "measure_regions"
@@ -61,7 +61,7 @@ echo "normalize_geometry"
 request_post /png/normalize_geometry "{
   \"image_path\": \"reference/target.png\",
   \"image_abs_path\": \"$TARGET_ABS\",
-  \"output_root\": \"$PDMT_OUTPUT_ROOT\",
+  \"output_root\": \"$PNG_OUTPUT_ROOT\",
   \"geometry\": {\"type\": \"point\", \"coordinates\": [349, 126]},
   \"from\": \"image_pixels\",
   \"to\": \"normalized_ink\"
@@ -71,7 +71,7 @@ echo "create_baseline"
 request_post /png/create_baseline "{
   \"image_path\": \"reference/target.png\",
   \"image_abs_path\": \"$TARGET_ABS\",
-  \"output_root\": \"$PDMT_OUTPUT_ROOT\",
+  \"output_root\": \"$PNG_OUTPUT_ROOT\",
   \"output_path\": \"target.baseline.json\",
   \"regions\": {\"frame\": [0.1, 0.1, 0.9, 0.9]},
   \"region_units\": \"normalized_image\"
@@ -89,7 +89,7 @@ fi
 
 echo "path_escape_status"
 STATUS="$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' \
-  -d '{"image_path":"../outside.png","image_abs_path":"/tmp/outside.png","output_root":"'"$PDMT_OUTPUT_ROOT"'"}' \
+  -d '{"image_path":"../outside.png","image_abs_path":"/tmp/outside.png","output_root":"'"$PNG_OUTPUT_ROOT"'"}' \
   "$BASE_URL/png/inspect_image")"
 if [[ "$STATUS" != "400" ]]; then
   echo "expected 400 for path escape, got $STATUS" >&2

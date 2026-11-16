@@ -1,20 +1,20 @@
 {
   "mcpServers": {
-    "png-diagram-measure": {
+    "dskt": {
       "command": "uv",
       "args": [
         "--directory",
-        "tools/png-measure/mcp",
+        "tools/dskt/mcp",
         "run",
-        "png-diagram-measure-mcp-server"
+        "dskt-mcp-server"
       ],
       "env": {
-        "PDMT_PORT": "${PDMT_PORT:-8087}",
-        "PDMT_HOST": "${PDMT_HOST:-127.0.0.1}",
-        "PDMT_REPO_ROOT": "${PDMT_REPO_ROOT:-.}",
-        "PDMT_OUTPUT_ROOT": "${PDMT_OUTPUT_ROOT:-tmp/png-measure}",
-        "PDMT_TRACE_LOG": "${PDMT_TRACE_LOG:-tmp/png-measure/tool-trace.jsonl}",
-        "PDMT_CLIENT_ROLE": "${PDMT_CLIENT_ROLE:-}"
+        "DSKT_PORT": "${DSKT_PORT:-8087}",
+        "DSKT_HOST": "${DSKT_HOST:-127.0.0.1}",
+        "DSKT_REPO_ROOT": "${DSKT_REPO_ROOT:-.}",
+        "DSKT_TRACE_LOG": "${DSKT_TRACE_LOG:-tmp/dskt/tool-trace.jsonl}",
+        "DSKT_CLIENT_ROLE": "${DSKT_CLIENT_ROLE:-}",
+        "PNG_OUTPUT_ROOT": "${PNG_OUTPUT_ROOT:-tmp/png-measure}"
       }
     }
   }
