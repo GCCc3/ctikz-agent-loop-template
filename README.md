@@ -68,8 +68,8 @@ without overwriting an existing reconstruction.
 
 The generator and reviewer can call typed PNG measurement tools through MCP.
 The tools inspect a PNG, build an ink mask, measure canvas and ink bounds,
-measure named regions, convert geometry between bases, and build a deterministic
-baseline document. They do not identify electrical components.
+measure named regions, and convert geometry between bases. They do not identify
+electrical components.
 
 One-time install into a dedicated Pharo image:
 
@@ -103,7 +103,7 @@ curl -s 'http://127.0.0.1:8087/png/trace?limit=50'
 
 `png_trace` is diagnostic only. It is not measurement evidence and is not part of
 the reconstruction loop. See `tools/png-measure/README.md` for environment
-variables, routes, and promotion of `reference/target.measurements.json`.
+variables and routes.
 
 ## CircuitTikZ catalog and lint tools
 

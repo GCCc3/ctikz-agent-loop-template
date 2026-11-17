@@ -5,6 +5,11 @@ tools:
   - read
   - ctikz_lookup_component
   - ctikz_lint_source
+  - png_inspect_image
+  - png_measure_bounds
+  - png_measure_regions
+  - png_normalize_geometry
+  - png_health
 # model: "@reviewer"
 thinking-level: high
 output:
@@ -77,10 +82,25 @@ Inspect both the target and rendered image with the image-reading capability
 available to the session. Base factual claims about compilation and deterministic
 checks only on `current/validation-result.json`.
 
+Use the PNG measurement tools for geometry:
+
+- call `png_inspect_image` once for each image you measure;
+- call `png_measure_bounds` and `png_measure_regions` on both
+  `reference/target.png` and `current/reconstruction.png` before making any
+  crop, margin, aspect-ratio, spacing, or alignment finding;
+- use `png_normalize_geometry` to convert between image pixels, ink bounds,
+  normalized coordinates, and centimetres;
+- `png_health` is diagnostic and does not provide measurement evidence.
+
+Every geometry finding must cite the tool name, the raw box or point, the
+coordinate basis, the mask threshold and background, and any warning codes.
+You are read-only: do not call `png_make_ink_mask`, create files, or edit the
+workspace. Do not infer visual fidelity from `ctikz_lint_source`; lint is
+structural only.
+
 Use `ctikz_lookup_component` for symbol/style facts and
-`ctikz_lint_source` for structural claims. Lint checks structure only; it does
-not establish visual fidelity. Do not invent component semantics that the
-lookup tool does not return.
+`ctikz_lint_source` for structural claims. Do not invent component semantics
+that the lookup tool does not return.
 
 Return exactly one decision:
 

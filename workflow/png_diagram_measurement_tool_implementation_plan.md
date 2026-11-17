@@ -1,6 +1,10 @@
 # PNG diagram measurement tool — implementation plan
 
-Status: proposal (not implemented).
+> Historical. The `create_baseline` / baseline JSON feature described in this
+> document was removed. The current implementation exposes inspection, mask,
+> bounds, regions, geometry conversion, health, and trace only.
+
+Status: historical; baseline feature removed.
 
 Implements `workflow/png_diagram_measurement_tool_plan_with_mask_and_tight_crop.md` (the **operation plan** below). Scope is exactly that document: `inspect_image`, `make_ink_mask`, `measure_bounds`, `measure_regions`, `normalize_geometry`, `create_baseline`. No TeX parsing, no image comparison, no connected components, no semantic labels.
 

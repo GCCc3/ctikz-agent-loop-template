@@ -67,16 +67,6 @@ request_post /png/normalize_geometry "{
   \"to\": \"normalized_ink\"
 }" | python_check "normalize_geometry"
 
-echo "create_baseline"
-request_post /png/create_baseline "{
-  \"image_path\": \"reference/target.png\",
-  \"image_abs_path\": \"$TARGET_ABS\",
-  \"output_root\": \"$PNG_OUTPUT_ROOT\",
-  \"output_path\": \"target.baseline.json\",
-  \"regions\": {\"frame\": [0.1, 0.1, 0.9, 0.9]},
-  \"region_units\": \"normalized_image\"
-}" | python_check "create_baseline"
-
 echo "trace"
 curl -sS "$BASE_URL/png/trace?limit=5" | python_check "trace"
 

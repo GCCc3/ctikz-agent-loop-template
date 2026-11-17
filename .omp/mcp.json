@@ -11,7 +11,7 @@
       "env": {
         "DSKT_PORT": "${DSKT_PORT:-8087}",
         "DSKT_HOST": "${DSKT_HOST:-127.0.0.1}",
-        "DSKT_REPO_ROOT": "${DSKT_REPO_ROOT:-.}",
+        "DSKT_REPO_ROOT": "${DSKT_REPO_ROOT:-../../..}",
         "DSKT_TRACE_LOG": "${DSKT_TRACE_LOG:-tmp/dskt/tool-trace.jsonl}",
         "DSKT_CLIENT_ROLE": "${DSKT_CLIENT_ROLE:-}",
         "PNG_OUTPUT_ROOT": "${PNG_OUTPUT_ROOT:-tmp/png-measure}"

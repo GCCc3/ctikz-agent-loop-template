@@ -1,5 +1,9 @@
 # PNG Diagram Measurement Tool Plan
 
+> Historical. The `create_baseline` operation and baseline JSON format described
+> in this document were removed. The current implementation does not generate,
+> promote, or read baselines.
+
 ## 1. Scope
 
 This plan defines a compact tool for measuring diagrams supplied as conventional PNG screenshots. The tool is intended to support an agent that reconstructs a diagram in LaTeX and needs deterministic geometric measurements from the reference image.

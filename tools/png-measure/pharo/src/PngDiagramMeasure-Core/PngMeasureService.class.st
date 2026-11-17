@@ -1,7 +1,7 @@
 "
 I am the measurement facade used by the HTTP server.
 
-I decode and cache images, build ink masks, measure bounds and regions, convert geometry, and build baselines.
+I decode and cache images, build ink masks, measure bounds and regions, and convert geometry.
 "
 Class {
 	#name : 'PngMeasureService',
@@ -142,37 +142,6 @@ PngMeasureService >> normalizeGeometry: request [
 		mask: mask
 		dpiX: (dpi at: 1)
 		dpiY: (dpi at: 2)
-]
-
-{ #category : 'operations' }
-PngMeasureService >> createBaseline: request [
-	| image parameters mask bounds regions units warnings document outputPath |
-	image := self imageFor: request.
-	parameters := self maskParametersFor: request.
-	mask := self maskFor: image parameters: parameters.
-	bounds := self measureBounds: request.
-	units := request at: 'region_units' ifAbsent: [ 'normalized_ink' ].
-	regions := request at: 'regions' ifAbsent: [ Dictionary new ].
-	regions := regions isEmpty
-		ifTrue: [ Dictionary new ]
-		ifFalse: [ (self measureRegions: request) at: 'regions' ].
-	warnings := OrderedCollection new.
-	warnings addAll: (bounds at: 'warnings').
-	document := PmdtBaselineBuilder
-		buildImage: image
-		path: (self imagePathFor: request)
-		parameters: parameters
-		mask: mask
-		bounds: bounds
-		regions: regions
-		regionUnits: units
-		warnings: warnings asArray.
-	document := PmdtBaselineBuilder withHash: document.
-	(request at: 'output_path' ifAbsent: [ nil ])
-		ifNotNil: [ :relative |
-			outputPath := (self outputDirectory: request) / relative.
-			self writeBytes: (DsktCanonicalJson toString: document) asByteArray to: outputPath request: request ].
-	^ document
 ]
 
 { #category : 'private' }

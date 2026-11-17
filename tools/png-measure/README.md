@@ -12,7 +12,7 @@ or port.
 | `DSKT_HOST` | `127.0.0.1` | Shared bind address |
 | `DSKT_REPO_ROOT` | current directory | Repository boundary |
 | `DSKT_TRACE_LOG` | `tmp/dskt/tool-trace.jsonl` | Shared trace log |
-| `PNG_OUTPUT_ROOT` | `tmp/png-measure` | Mask and baseline output root |
+| `PNG_OUTPUT_ROOT` | `tmp/png-measure` | Mask output root |
 | `PNG_MAX_PIXELS` | `50000000` | Decoded image pixel limit |
 
 ## Routes
@@ -24,7 +24,6 @@ or port.
 - `POST /png/measure_bounds`
 - `POST /png/measure_regions`
 - `POST /png/normalize_geometry`
-- `POST /png/create_baseline`
 
 All routes use the shared success/error envelope. Paths are resolved under
 `DSKT_REPO_ROOT`; symlinks and sibling-prefix escapes are rejected.

@@ -18,12 +18,9 @@ explicitly writes under `tmp/png-measure/`.
    Enlarge a window when the result warns `region_ink_extends_beyond_window`.
 4. Call `png_normalize_geometry` to convert explicit TeX coordinates into the
    same basis as the measurement.
-5. Call `png_create_baseline` once for `reference/target.png`. Without
-   `output_path` it returns the document and writes nothing. The coordinator
-   promotes the result into `reference/`.
-6. Cite the raw box, threshold, background, and basis with every number. Never
+5. Cite the raw box, threshold, background, and basis with every number. Never
    describe a measurement as a semantic identification.
-7. Use `png_trace` only to audit tool usage or answer a human question. It is
+6. Use `png_trace` only to audit tool usage or answer a human question. It is
    diagnostic, not measurement evidence, and is never part of the measurement
    loop.
 

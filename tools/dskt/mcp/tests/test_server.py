@@ -34,6 +34,10 @@ class ToolRegistryTest(unittest.TestCase):
         }:
             self.assertIn(expected, names)
 
+    def test_baseline_tool_removed(self):
+        names = {name for _, name, _, _ in TOOLS}
+        self.assertNotIn("png_create_baseline", names)
+
     def test_module_filter_keeps_only_lint(self):
         selected = [
             name

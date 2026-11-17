@@ -10,6 +10,11 @@ tools:
   - ctikz_render_snippet
   - ctikz_lookup_component
   - ctikz_lint_source
+  - png_inspect_image
+  - png_measure_bounds
+  - png_measure_regions
+  - png_normalize_geometry
+  - png_health
 # model: "@generator"
 thinking-level: high
 output:
@@ -73,6 +78,21 @@ Before editing, read:
 Inspect `reference/target.png` with the image-reading capability available to
 the session. If the image cannot be inspected, return `blocked` and identify
 the missing capability.
+
+Use the PNG measurement tools for geometry:
+
+- call `png_inspect_image` once for each image you measure;
+- call `png_measure_bounds` and `png_measure_regions` on both
+  `reference/target.png` and `current/reconstruction.png` before making or
+  changing crop, margin, aspect-ratio, spacing, or alignment decisions;
+- use `png_normalize_geometry` to convert between image pixels, ink bounds,
+  normalized coordinates, and centimetres;
+- `png_health` is diagnostic and does not provide measurement evidence.
+
+Every geometry claim must cite the tool name, the raw box or point, the
+coordinate basis, the mask threshold and background, and any warning codes.
+Measurement informs geometry; you still write `current/reconstruction.tex`
+yourself. Do not treat a measurement as a semantic component identification.
 
 Do not run shell commands, render the document, validate it, archive an
 iteration, or decide that the overall workflow is complete. Those are

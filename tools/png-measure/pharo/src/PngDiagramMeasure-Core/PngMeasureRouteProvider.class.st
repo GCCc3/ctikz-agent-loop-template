@@ -48,8 +48,7 @@ PngMeasureRouteProvider >> installRoutesOn: server [
 		POST: '/png/make_ink_mask' -> [ :request | server handleOperation: 'png_make_ink_mask' selector: #makeInkMask: request: request service: self service details: [ :result | self traceDetailsFor: result request: request ] ];
 		POST: '/png/measure_bounds' -> [ :request | server handleOperation: 'png_measure_bounds' selector: #measureBounds: request: request service: self service details: [ :result | self traceDetailsFor: result request: request ] ];
 		POST: '/png/measure_regions' -> [ :request | server handleOperation: 'png_measure_regions' selector: #measureRegions: request: request service: self service details: [ :result | self traceDetailsFor: result request: request ] ];
-		POST: '/png/normalize_geometry' -> [ :request | server handleOperation: 'png_normalize_geometry' selector: #normalizeGeometry: request: request service: self service details: [ :result | self traceDetailsFor: result request: request ] ];
-		POST: '/png/create_baseline' -> [ :request | server handleOperation: 'png_create_baseline' selector: #createBaseline: request: request service: self service details: [ :result | self traceDetailsFor: result request: request ] ]
+		POST: '/png/normalize_geometry' -> [ :request | server handleOperation: 'png_normalize_geometry' selector: #normalizeGeometry: request: request service: self service details: [ :result | self traceDetailsFor: result request: request ] ]
 ]
 
 { #category : 'health' }
@@ -89,6 +88,6 @@ PngMeasureRouteProvider >> traceDetailsFor: result request: request [
 		at: 'image_sha256' put: ((image isKindOf: Dictionary) ifTrue: [ image at: 'sha256' ifAbsent: [ nil ] ] ifFalse: [ request at: 'image_sha256' ifAbsent: [ nil ] ]);
 		at: 'region_count' put: ((regions isKindOf: Dictionary) ifTrue: [ regions size ] ifFalse: [ 0 ]);
 		at: 'empty_region_count' put: ((regions isKindOf: Dictionary) ifTrue: [ regions values count: [ :each | (each at: 'status' ifAbsent: [ '' ]) = 'empty' ] ] ifFalse: [ 0 ]);
-		at: 'output_written' put: ((result isKindOf: Dictionary) and: [ (result includesKey: 'mask_path') or: [ result includesKey: 'baseline_sha256' ] ]);
+		at: 'output_written' put: ((result isKindOf: Dictionary) and: [ result includesKey: 'mask_path' ]);
 		yourself
 ]

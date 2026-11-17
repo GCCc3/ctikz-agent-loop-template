@@ -1,5 +1,5 @@
 "
-I test masking, bounds, regions, geometry conversion, and baseline assembly on a synthetic image.
+I test masking, bounds, regions, and geometry conversion on a synthetic image.
 "
 Class {
 	#name : 'PmdtMeasurementTest',
@@ -91,23 +91,4 @@ PmdtMeasurementTest >> testGeometryConversion [
 	self assert: (result at: 'warnings') isEmpty
 ]
 
-{ #category : 'tests' }
-PmdtMeasurementTest >> testBaselineHash [
-	| image mask bounds document hashed |
-	image := self image.
-	mask := PmdtLuminanceClassifier maskFor: image parameters: self parameters.
-	bounds := PmdtBoundsMeasurer
-		measure: image mask: mask dpiX: nil dpiY: nil source: 'unknown'.
-	document := PmdtBaselineBuilder
-		buildImage: image
-		path: 'fixture.png'
-		parameters: self parameters
-		mask: mask
-		bounds: bounds
-		regions: Dictionary new
-		regionUnits: 'normalized_ink'
-		warnings: #().
-	hashed := PmdtBaselineBuilder withHash: document.
-	self assert: (hashed at: 'baseline_sha256') size equals: 64.
-	self assert: (hashed at: 'image' at: 'sha256') equals: 'fixture'
-]
+

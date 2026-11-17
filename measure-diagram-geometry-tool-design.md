@@ -1,7 +1,7 @@
 ---
 title: How the proposed measure_diagram_geometry MCP tool would work
+status: historical; baseline feature removed
 date: 2026-11-05
-status: proposal (not implemented)
 source: analysis/efficiency-through-003.md (tool proposal 1, confidence high)
 patternsAddressed: [P1, P2, P5, P6, P9]
 note: >-

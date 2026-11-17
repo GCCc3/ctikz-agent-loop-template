@@ -23,8 +23,6 @@ for file in \
   scripts/png-measure-install.sh \
   scripts/png-measure-start.sh \
   scripts/png-measure-smoke.sh \
-  scripts/promote-baseline.sh \
-  schemas/png-measurement.schema.json \
   schemas/png-trace.schema.json \
   workflow/efficiency-analysis.md \
   scripts/render-efficiency-report.py \

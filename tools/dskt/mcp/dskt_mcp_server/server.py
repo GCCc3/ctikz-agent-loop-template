@@ -113,23 +113,6 @@ def png_normalize_geometry(
     )
 
 
-def png_create_baseline(
-    image_path: str,
-    regions: dict[str, list[float]] | None = None,
-    region_units: str = "normalized_ink",
-    mask: dict[str, Any] | None = None,
-    output_path: str | None = None,
-    dpi_override: dict[str, float] | None = None,
-) -> dict[str, Any]:
-    """Build a deterministic baseline document, optionally writing it under the output root."""
-    extra: dict[str, Any] = {"region_units": region_units}
-    if regions is not None:
-        extra["regions"] = regions
-    if output_path is not None:
-        extra["output_path"] = output_path
-    return _png("create_baseline", image_path, mask=mask, dpi_override=dpi_override, extra=extra)
-
-
 def png_health() -> dict[str, Any]:
     """Report PNG measurement health and cache status."""
     return get_json("/png/health")
@@ -248,7 +231,6 @@ TOOLS = [
     ("png", "png_measure_bounds", png_measure_bounds, READONLY),
     ("png", "png_measure_regions", png_measure_regions, READONLY),
     ("png", "png_normalize_geometry", png_normalize_geometry, READONLY),
-    ("png", "png_create_baseline", png_create_baseline, WRITE),
     ("png", "png_health", png_health, READONLY),
     ("png", "png_trace", png_trace, READONLY),
     ("ctikz_catalog", "ctikz_list_snippets", ctikz_list_snippets, READONLY),
