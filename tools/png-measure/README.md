@@ -33,7 +33,7 @@ All routes use the shared success/error envelope. Paths are resolved under
 ```bash
 export PHARO=/path/to/pharo
 export DSKT_BASE_IMAGE=/path/to/base.image
-scripts/ctikz-tools-install.sh
-scripts/png-measure-start.sh
+scripts/dskt-install.sh
+scripts/dskt-start.sh
 scripts/png-measure-smoke.sh
 ```

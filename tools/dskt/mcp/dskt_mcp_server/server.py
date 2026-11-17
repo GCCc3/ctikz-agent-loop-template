@@ -14,14 +14,16 @@ from .core import (
     get_json,
     png_payload,
     post_json,
+    schemabloc_snippet_path,
     snippet_path,
 )
 
 mcp = FastMCP(
     "dskt",
     instructions=(
-        "Measure PNG geometry and inspect or render CircuitTikZ snippets through one "
-        "Pharo DsktServer. Use typed tools; do not infer visual fidelity from lint."
+        "Measure PNG geometry and inspect, render, and lint CircuitTikZ or Schemabloc "
+        "snippets through one Pharo DsktServer. Use typed tools; do not infer visual "
+        "fidelity from lint."
     ),
 )
 
@@ -200,6 +202,78 @@ def ctikz_lint_source(
     return post_json("/ctikz/lint", payload)
 
 
+# --- Schemabloc catalog -------------------------------------------------
+
+
+def schemabloc_list_snippets(
+    q: str | None = None,
+    tag: str | None = None,
+    component: str | None = None,
+    kind: str | None = None,
+) -> dict[str, Any]:
+    """List or search the Schemabloc snippet catalog."""
+    params: dict[str, Any] = {}
+    if q:
+        params["q"] = q
+    if tag:
+        params["tag"] = tag
+    if component:
+        params["component"] = component
+    if kind:
+        params["kind"] = kind
+    return get_json("/schemabloc/snippets", params)
+
+
+def schemabloc_get_snippet(snippet_id: str) -> dict[str, Any]:
+    """Get one Schemabloc snippet by id, including schema, presets, and checksum."""
+    return get_json(schemabloc_snippet_path(snippet_id))
+
+
+def schemabloc_render_snippet(
+    snippet_id: str, parameters: dict[str, Any] | None = None
+) -> dict[str, Any]:
+    """Render one Schemabloc snippet with caller parameters merged over defaults."""
+    return post_json(
+        "/schemabloc/render_snippet",
+        {"snippet_id": snippet_id, "parameters": parameters or {}},
+    )
+
+
+def schemabloc_lookup_component(component: str) -> dict[str, Any]:
+    """Look up a Schemabloc macro and return its semantic description and snippets."""
+    return post_json("/schemabloc/components", {"component": component})
+
+
+# --- Schemabloc lint ----------------------------------------------------
+
+
+def schemabloc_lint_source(
+    path: str | None = None,
+    source_text: str | None = None,
+    required_labels: list[str] | None = None,
+    forbid_patterns: list[str] | None = None,
+    strict: bool = False,
+) -> dict[str, Any]:
+    """Lint Schemabloc source by repository path or exact text."""
+    if path is None and source_text is None:
+        path = "current-control/reconstruction.tex"
+    payload: dict[str, Any] = {"strict": bool(strict)}
+    if path is not None:
+        payload["path"] = path
+    if source_text is not None:
+        payload["source_text"] = source_text
+    if required_labels is not None:
+        payload["required_labels"] = required_labels
+    if forbid_patterns is not None:
+        payload["forbid_patterns"] = forbid_patterns
+    return post_json("/schemabloc/lint", payload)
+
+
+def schemabloc_health() -> dict[str, Any]:
+    """Report Schemabloc catalog and lint health."""
+    return get_json("/schemabloc/health")
+
+
 # --- Common health and trace -------------------------------------------
 
 
@@ -238,6 +312,12 @@ TOOLS = [
     ("ctikz_catalog", "ctikz_render_snippet", ctikz_render_snippet, READONLY),
     ("ctikz_catalog", "ctikz_lookup_component", ctikz_lookup_component, READONLY),
     ("ctikz_lint", "ctikz_lint_source", ctikz_lint_source, READONLY),
+    ("schemabloc_catalog", "schemabloc_list_snippets", schemabloc_list_snippets, READONLY),
+    ("schemabloc_catalog", "schemabloc_get_snippet", schemabloc_get_snippet, READONLY),
+    ("schemabloc_catalog", "schemabloc_render_snippet", schemabloc_render_snippet, READONLY),
+    ("schemabloc_catalog", "schemabloc_lookup_component", schemabloc_lookup_component, READONLY),
+    ("schemabloc_lint", "schemabloc_lint_source", schemabloc_lint_source, READONLY),
+    ("schemabloc", "schemabloc_health", schemabloc_health, READONLY),
     ("dskt", "dskt_health", dskt_health, READONLY),
     ("dskt", "dskt_trace", dskt_trace, READONLY),
 ]

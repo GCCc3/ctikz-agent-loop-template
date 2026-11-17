@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Schemabloc snippet catalog response",
+  "type": "object",
+  "required": ["success", "schema_version", "tool_version", "result"],
+  "properties": {
+    "success": { "type": "boolean" },
+    "schema_version": { "type": "integer" },
+    "tool_version": { "type": "string" },
+    "result": {
+      "type": "object",
+      "required": ["catalog_version", "snippets"],
+      "properties": {
+        "catalog_version": { "type": "string" },
+        "snippets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "kind", "tags", "parameters", "source", "checksum"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "kind": { "type": "string" },
+              "tags": { "type": "array", "items": { "type": "string" } },
+              "description": { "type": ["string", "null"] },
+              "parameters": { "type": "array" },
+              "presets": { "type": "object" },
+              "requires": { "type": "object" },
+              "provides": { "type": "object" },
+              "source": { "type": "string" },
+              "version": { "type": "integer" },
+              "checksum": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

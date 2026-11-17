@@ -125,7 +125,7 @@ tools/circuitikz-tools/pharo/src/
 schemas/circuitikz-snippets.schema.json
 schemas/circuitikz-lint.schema.json
 scripts/ctikz-tools-smoke.sh
-scripts/ctikz-tools-install.sh          # loads Dskt + all domain baselines and snapshots
+scripts/dskt-install.sh               # loads Dskt + all domain baselines and snapshots
 .omp/mcp.json                          # one dskt-mcp-server entry
 ```
 

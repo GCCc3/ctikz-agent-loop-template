@@ -36,6 +36,18 @@ bash:
       approval: allow
     - match: "scripts/next-iteration-number.sh"
       approval: allow
+    - match: "scripts/control/init-current.sh"
+      approval: allow
+    - match: "scripts/control/check-workspace.sh"
+      approval: allow
+    - match: "scripts/control/render.sh"
+      approval: allow
+    - match: "scripts/control/validate.sh"
+      approval: allow
+    - match: "scripts/control/archive-iteration.sh"
+      approval: allow
+    - match: "scripts/control/next-iteration-number.sh"
+      approval: allow
     - match: "scripts/render-efficiency-report.py *"
       approval: allow
     - match: "rm -rf *"

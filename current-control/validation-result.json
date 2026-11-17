@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "renderingStatus": "passed",
+  "sourceArtifact": "current-control/reconstruction.tex",
+  "renderedArtifacts": [
+    "current-control/reconstruction.pdf",
+    "current-control/reconstruction.png"
+  ],
+  "checks": [
+    {
+      "name": "source-exists",
+      "status": "passed",
+      "message": "The reconstruction source exists and is non-empty."
+    },
+    {
+      "name": "schemabloc-lint",
+      "status": "passed",
+      "message": "schemabloc lint: passed=14, warning=0, failed=0"
+    },
+    {
+      "name": "pdf-exists",
+      "status": "passed",
+      "message": "The rendered PDF exists and is non-empty."
+    },
+    {
+      "name": "png-exists",
+      "status": "passed",
+      "message": "The rendered PNG exists and is non-empty."
+    }
+  ],
+  "failureSummary": null
+}

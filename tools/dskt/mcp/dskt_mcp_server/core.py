@@ -211,3 +211,7 @@ def png_payload(
 
 def snippet_path(snippet_id: str) -> str:
     return "/ctikz/snippets/" + quote(snippet_id, safe="/")
+
+
+def schemabloc_snippet_path(snippet_id: str) -> str:
+    return "/schemabloc/snippets/" + quote(snippet_id, safe="/")

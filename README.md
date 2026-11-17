@@ -86,7 +86,7 @@ startup list, and snapshots. The start script runs the saved image once per boot
 do not reload the Pharo code per reconstruction iteration:
 
 ```bash
-scripts/png-measure-start.sh
+scripts/dskt-start.sh
 ```
 
 The measurement service listens on `127.0.0.1:8087` by default. It is local-only
@@ -122,8 +122,8 @@ export PHARO="$HOME/pharo-launcher/pharo-vm/pharo"
 export DSKT_BASE_IMAGE="/path/to/base.image"
 # On this workstation:
 # export DSKT_BASE_IMAGE=/home/codespace/moose13-base/Moose13-stable-Pharo64-14/Moose13-stable-Pharo64-14.image
-scripts/ctikz-tools-install.sh
-scripts/png-measure-start.sh
+scripts/dskt-install.sh
+scripts/dskt-start.sh
 ```
 
 The catalog is a lookup library, not a document generator. The agent composes
@@ -137,6 +137,31 @@ Run the domain smoke test against a live server:
 ```bash
 scripts/ctikz-tools-smoke.sh
 ```
+
+## Schemabloc control-diagram tools
+
+The same `dskt` server also exposes the Schemabloc domain:
+
+- `schemabloc_list_snippets`, `schemabloc_get_snippet`,
+  `schemabloc_lookup_component`;
+- `schemabloc_render_snippet` for leaf macros;
+- `schemabloc_lint_source` for structural checks of control-diagram TeX;
+- `schemabloc_health` for catalog and lint health.
+
+The control profile keeps its own paths and artifacts:
+
+```bash
+scripts/control/init-current.sh
+scripts/control/check-workspace.sh
+scripts/control/render.sh
+scripts/control/validate.sh
+scripts/control-smoke.sh
+```
+
+`current-control/reconstruction.tex` is the control source. The Schemabloc
+catalog is a lookup library, not a document generator; the agent composes
+macros and writes the source. `schemabloc_lint_source` is read-only and does
+not establish visual fidelity.
 
 ## Start the workflow
 

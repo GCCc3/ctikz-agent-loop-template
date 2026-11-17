@@ -268,7 +268,7 @@ Reuse the existing generation/review/validation/iteration schemas if they are ge
 
 Add the Schemabloc baseline to the shared install path:
 
-- load `BaselineOfSchemabloc` in `scripts/ctikz-tools-install.sh` (or rename it to `scripts/dskt-install.sh`);
+- load `BaselineOfSchemabloc` in `scripts/dskt-install.sh`;
 - assert the `schemabloc` provider is registered before snapshotting;
 - no second image or port.
 
@@ -366,22 +366,25 @@ covering the macro catalog, measurement workflow, citation rule, and no-baseline
 
 ### `scripts/control/validate.sh` or profile-aware `validate.sh`
 
-Checks:
+Source-level checks are owned exclusively by `schemabloc_lint_source`.
+`validate.sh` must not reimplement them.
 
-1. source exists and is non-empty;
-2. `\usepackage{schemabloc}` present;
-3. exactly one `tikzpicture`;
-4. no `circuitikz` package/environment in the control profile;
-5. no `\includegraphics`, `control_diagram.png`, or `target.png`;
-6. braces and environments balanced;
-7. every `sb*` link endpoint resolves;
-8. duplicate node names absent;
-9. required labels present;
-10. PDF and PNG exist and are non-empty;
-11. block/comparator/link inventory is reported;
-12. warnings for manual rectangles and unknown `sb*` macros.
+`validate.sh` is the post-render coordinator gate. It checks only:
 
-Write `current-control/validation-result.json` using the existing validation schema or a control-specific schema.
+1. the source exists and is non-empty;
+2. the lint result is present and has zero `failed` checks;
+3. the PDF and PNG exist and are non-empty;
+4. the lint warning counts and artifact status are recorded.
+
+It may invoke the lint path through the local Dskt service, or consume a
+freshly produced lint result. If lint cannot run, validation fails closed.
+It does not re-check `schemabloc` package presence, `tikzpicture` count,
+`circuitikz` absence, image inclusion, braces, environments, node uniqueness,
+link endpoints, label presence, or macro inventory; those are lint rules.
+
+Write `current-control/validation-result.json` using the existing validation
+schema or a control-specific schema. The result combines the lint checks with
+the artifact checks.
 
 ### Smoke test
 
@@ -431,7 +434,7 @@ Cover:
 2. Control profile paths and scripts work without touching circuit files.
 3. `schemabloc_*` MCP tools are callable by Bash/eval-denied agents.
 4. A control generator can render blocks, comparators, and links; lint the source; write `current-control/reconstruction.tex`.
-5. `render.sh` produces PDF/PNG; `validate.sh` passes the structural checks.
+5. `render.sh` produces PDF/PNG; `validate.sh` passes the artifact gate using the `schemabloc_lint_source` result.
 6. The reviewer can measure both target and render and accept/revise with cited geometry.
 7. The circuit workflow remains green.
 8. The shared `DsktService.image` contains both `ctikz` and `schemabloc` providers.

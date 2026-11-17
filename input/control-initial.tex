@@ -1,0 +1,141 @@
+\documentclass[border=5mm]{standalone}
+
+\usepackage{amsmath}
+\usepackage{schemabloc}
+
+\usetikzlibrary{arrows.meta,calc,positioning}
+
+\tikzset{
+  feedback/.style={
+    -{Latex[length=1.8mm,width=1.2mm]},
+    line width=0.45pt
+  },
+  branch/.style={
+    circle,
+    fill=black,
+    inner sep=0pt,
+    minimum size=1.4mm
+  },
+  sign/.style={
+    font=\scriptsize,
+    inner sep=1pt
+  }
+}
+
+\begin{document}
+
+\begin{tikzpicture}[font=\small,auto]
+
+% Main forward path
+\sbEntree{vref}
+\sbComp{sumv}{vref}
+\sbBloc[2.1]{Gva}{$G_{\mathrm{va}}$}{sumv}
+\sbComp[2.0]{sumi}{Gva}
+\sbBloc[2.0]{Gireg}{$G_{\mathrm{ireg}}$}{sumi}
+\sbComp[2.0]{summ}{Gireg}
+\sbBloc[2.0]{Gdel}{$G_{\mathrm{del}}$}{summ}
+\sbBloc[2.0]{GLf}{$G_{L_f}^{-1}$}{Gdel}
+\sbBloc[2.0]{Zg}{$Z_g$}{GLf}
+\sbComp[2.0]{sumvg}{Zg}
+\sbSortie[2.0]{vout}{sumvg}
+
+% Forward-path connections
+\sbRelier[$\hat v_{\mathrm{ref}}$]{vref}{sumv}
+\sbRelier{sumv}{Gva}
+\sbRelier[$\hat i_{\mathrm{ref}}$]{Gva}{sumi}
+\sbRelier[$\hat e_i$]{sumi}{Gireg}
+\sbRelier{Gireg}{summ}
+\sbRelier{Gdel}{summ}
+\sbRelier{summ}{Gdel}
+\sbRelier[$\hat i$]{GLf}{Zg}
+\sbRelier{Zg}{sumvg}
+\sbRelier[$\hat v$]{sumvg}{vout}
+
+% Voltage input and feedforward path
+\coordinate (vinput) at ($(summ.south)+(0,-2.7)$);
+
+\node[
+  draw,
+  rectangle,
+  minimum width=1.3cm,
+  minimum height=0.8cm,
+  anchor=center
+] (Gff) at ($(Gireg.south)+(1.25,-2.25)$)
+  {$G_{\mathrm{ff}}$};
+
+\coordinate (vbranch) at ($(vinput)!0.32!(summ.south)$);
+\node[branch] at (vbranch) {};
+
+\draw[feedback]
+  (vinput)
+  node[below] {$\hat v$}
+  --
+  (summ.south);
+
+\draw[line width=0.45pt]
+  (vbranch)
+  -|
+  (Gff.south);
+
+\draw[feedback]
+  (Gff.east)
+  -|
+  ($(summ.south)+(0,-0.15)$);
+
+% Voltage feedback to first comparator
+\coordinate (vreturn) at ($(sumv.south)+(0,-3.4)$);
+
+\draw[line width=0.45pt]
+  (vbranch)
+  -|
+  (vreturn);
+
+\draw[feedback]
+  (vreturn)
+  --
+  (sumv.south);
+
+% Current feedback to inner current comparator
+\coordinate (ibranch) at ($(GLf.east)!0.48!(Zg.west)$);
+\node[branch] at (ibranch) {};
+
+\coordinate (ireturn) at ($(sumi.south)+(0,-3.9)$);
+
+\draw[line width=0.45pt]
+  (ibranch)
+  |-
+  (ireturn);
+
+\draw[feedback]
+  (ireturn)
+  --
+  (sumi.south);
+
+% Grid-voltage input into the output summing junction
+\coordinate (vginput) at ($(sumvg.south)+(0,-1.8)$);
+\draw[feedback]
+  (vginput)
+  node[below] {$\hat v_g$}
+  --
+  (sumvg.south);
+
+% Summing-junction signs
+\node[sign, above left=-0.5mm and 0.8mm of sumv] {$+$};
+\node[sign, below right=-0.5mm and 0.8mm of sumv] {$-$};
+
+\node[sign, above left=-0.5mm and 0.8mm of sumi] {$+$};
+\node[sign, below right=-0.5mm and 0.8mm of sumi] {$-$};
+
+\node[sign, above left=-0.5mm and 0.8mm of summ] {$+$};
+\node[sign, below right=-0.5mm and 0.8mm of summ] {$-$};
+\node[sign] at ($(summ.south)+(-0.20,-0.31)$) {$+$};
+
+\node[sign, above left=-0.5mm and 0.8mm of sumvg] {$+$};
+\node[sign, below right=-0.5mm and 0.8mm of sumvg] {$-$};
+
+% Panel label
+\node[below=8mm of Gff, font=\normalsize] {(c)};
+
+\end{tikzpicture}
+
+\end{document}

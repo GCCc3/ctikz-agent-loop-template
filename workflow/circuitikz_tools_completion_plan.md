@@ -36,7 +36,7 @@ Scope: close every gap found in the review of `workflow/circuitikz_tools_impleme
 
 ### W1.1 — Make install reproducible
 
-- Fix `scripts/ctikz-tools-install.sh`:
+- Fix `scripts/dskt-install.sh`:
   - Ensure the default `DSKT_IMAGE` parent exists; fail with a clear message when `DSKT_BASE_IMAGE` is absent. The default image is `tmp/dskt/DsktService.image`.
   - On this workstation, the base image is `/home/codespace/moose13-base/Moose13-stable-Pharo64-14/Moose13-stable-Pharo64-14.image` and the VM wrapper is `/home/codespace/moose13/pharo`. Set `DSKT_BASE_IMAGE` and `PHARO` accordingly. The image is a Pharo 14 Moose image and already contains Teapot, Beacon, and NeoJSON. It is not currently running, so its `.changes` file can be copied safely.
   - Load `BaselineOfDskt`, `BaselineOfPngDiagramMeasure`, `BaselineOfCtikzTools` in that order.
@@ -53,7 +53,7 @@ Scope: close every gap found in the review of `workflow/circuitikz_tools_impleme
 
 ### W1.3 — Make start/smoke scripts consistent
 
-- Fix `scripts/png-measure-start.sh` and `scripts/png-measure-install.sh` stale “PDM service” messages and missing-default-image guidance.
+- Fix `scripts/dskt-start.sh` and `scripts/png-measure-install.sh` stale “PDM service” messages and missing-default-image guidance.
 - Extend `scripts/ctikz-tools-smoke.sh` to assert:
   - `ctikz_health` fields;
   - trace enrichment fields;
@@ -216,7 +216,7 @@ Add the missing tests from the plan’s Phase 4/§8:
 - Update `workflow/circuitikz_tools_implementation_plan.md`: change `Status: proposal (not implemented)` to the actual state and link this completion plan.
 - Rewrite `workflow/png_measurement_operational_steps.md` to `DsktServer`, `PngMeasureRouteProvider`/`PngMeasureService`, `DSKT_*`, `PNG_*`, and `/png/*`; or mark it historical and point to the current README.
 - Add `tools/png-measure/README.md` with env vars, routes, and trace path, or fix the root README link.
-- Fix stale `PDM` wording in `scripts/png-measure-install.sh` and `scripts/png-measure-start.sh`.
+- Fix stale `PDM` wording in `scripts/png-measure-install.sh` and `scripts/dskt-start.sh`.
 - Remove dead code: unused `CtikzLintReport` path if W3.5 deletes it; old PNG MCP package; any unused `PDMT_*` references.
 - Run the full test matrix and commit the completed work.
 
@@ -226,7 +226,7 @@ The plan is complete when all of these pass:
 
 1. `Ctikz-*`, `Dskt-*`, and `PngDiagramMeasure-*` SUnit suites are green.
 2. `tools/dskt/mcp` tests cover core, client, server, filters, and annotations.
-3. `scripts/ctikz-tools-install.sh` snapshots an image; after reboot `/health` lists `png` and `ctikz`, and `/ctikz/health` is valid.
+3. `scripts/dskt-install.sh` snapshots an image; after reboot `/health` lists `png` and `ctikz`, and `/ctikz/health` is valid.
 4. `scripts/ctikz-tools-smoke.sh` passes against the rebuilt server.
 5. Symlink, sibling-prefix, `..`, absolute, and oversize path tests all fail closed.
 6. Ctikz trace lines contain `tool_family`, `snippet_id`/`source_path`, `check_counts`, `catalog_version`, and `lint_rules_version`.

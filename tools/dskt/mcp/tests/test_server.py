@@ -29,6 +29,12 @@ class ToolRegistryTest(unittest.TestCase):
             "ctikz_render_snippet",
             "ctikz_lookup_component",
             "ctikz_lint_source",
+            "schemabloc_list_snippets",
+            "schemabloc_get_snippet",
+            "schemabloc_render_snippet",
+            "schemabloc_lookup_component",
+            "schemabloc_lint_source",
+            "schemabloc_health",
             "dskt_health",
             "dskt_trace",
         }:
@@ -54,6 +60,22 @@ class ToolRegistryTest(unittest.TestCase):
         ]
         self.assertEqual(selected, ["ctikz_render_snippet"])
 
+    def test_module_filter_keeps_schemabloc_lint(self):
+        selected = [
+            name
+            for module, name, _, _ in TOOLS
+            if _allowed(module, name, {"schemabloc_lint"}, set())
+        ]
+        self.assertEqual(selected, ["schemabloc_lint_source"])
+
+    def test_explicit_schemabloc_tool_filter(self):
+        selected = [
+            name
+            for module, name, _, _ in TOOLS
+            if _allowed(module, name, set(), {"schemabloc_render_snippet"})
+        ]
+        self.assertEqual(selected, ["schemabloc_render_snippet"])
+
     def test_register_tools_module_filter(self):
         fake = FakeMCP()
         with patch.object(server, "mcp", fake), patch.dict(
@@ -75,4 +97,11 @@ class ToolRegistryTest(unittest.TestCase):
             server.ctikz_lint_source()
         payload = post.call_args.args[1]
         self.assertEqual(payload["path"], "current/reconstruction.tex")
+        self.assertNotIn("source_text", payload)
+
+    def test_schemabloc_lint_defaults_to_control_path(self):
+        with patch.object(server, "post_json", return_value={}) as post:
+            server.schemabloc_lint_source()
+        payload = post.call_args.args[1]
+        self.assertEqual(payload["path"], "current-control/reconstruction.tex")
         self.assertNotIn("source_text", payload)

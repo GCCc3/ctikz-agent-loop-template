@@ -21,7 +21,8 @@ for file in \
   .omp/mcp.json \
   .omp/skills/png-diagram-measure/SKILL.md \
   scripts/png-measure-install.sh \
-  scripts/png-measure-start.sh \
+  scripts/dskt-install.sh \
+  scripts/dskt-start.sh \
   scripts/png-measure-smoke.sh \
   schemas/png-trace.schema.json \
   workflow/efficiency-analysis.md \

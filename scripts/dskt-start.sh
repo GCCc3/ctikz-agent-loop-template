@@ -16,7 +16,7 @@ DSKT_AUTOSTART=1
 
 if [[ ! -f "$DSKT_IMAGE" ]]; then
   echo "DSKT_IMAGE does not exist: $DSKT_IMAGE" >&2
-  echo "Run scripts/png-measure-install.sh first." >&2
+  echo "Run scripts/dskt-install.sh first." >&2
   exit 2
 fi
 

@@ -1,31 +1,29 @@
 Rc files read:
   /etc/LatexMk
-Latexmk: This is Latexmk, John Collins, 15 June 2025. Version 4.87.
+Latexmk: This is Latexmk, John Collins, 31 Jan. 2024. Version 4.83.
+Latexmk: Getting log file 'current-control/reconstruction.log'
+Latexmk: Examining 'current-control/reconstruction.log'
+No existing .aux file, so I'll make a simple one, and require run of *latex.
 Latexmk: applying rule 'pdflatex'...
 Rule 'pdflatex':  Reasons for rerun
-Changed files or newly in use/created:
-  /home/gcorsi/code/circuitikz-agent-loop-template/current/reconstruction.tex
-  current/reconstruction.tex
-Category 'changed_user':
-  /home/gcorsi/code/circuitikz-agent-loop-template/current/reconstruction.tex
-  current/reconstruction.tex
-Category 'no_dest':
-  pdflatex
+Category 'other':
+  Rerun of 'pdflatex' forced or previously required:
+    Reason or flag: 'Initial setup'
 
 ------------
 Run number 1 of rule 'pdflatex'
 ------------
 ------------
-Running 'pdflatex  -interaction=nonstopmode -halt-on-error -file-line-error -recorder -output-directory="current"  "/home/gcorsi/code/circuitikz-agent-loop-template/current/reconstruction.tex"'
+Running 'pdflatex  -interaction=nonstopmode -halt-on-error -file-line-error -recorder -output-directory="current-control"  "/workspaces/ctikz-agent-loop-template/current-control/reconstruction.tex"'
 ------------
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025/Debian) (preloaded format=pdflatex)
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
 entering extended mode
-(/home/gcorsi/code/circuitikz-agent-loop-template/current/reconstruction.tex
-LaTeX2e <2025-11-01>
-L3 programming layer <2026-01-19>
+(/workspaces/ctikz-agent-loop-template/current-control/reconstruction.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
 (/usr/share/texlive/texmf-dist/tex/latex/standalone/standalone.cls
-Document Class: standalone 2025/02/22 v1.5a Class to compile TeX sub-files stan
+Document Class: standalone 2022/10/10 v1.3b Class to compile TeX sub-files stan
 dalone
 (/usr/share/texlive/texmf-dist/tex/latex/tools/shellesc.sty)
 (/usr/share/texlive/texmf-dist/tex/generic/iftex/ifluatex.sty
@@ -36,9 +34,16 @@ dalone
 (/usr/share/texlive/texmf-dist/tex/generic/xkeyval/keyval.tex))))
 (/usr/share/texlive/texmf-dist/tex/latex/standalone/standalone.cfg)
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
-Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo)))
-(/usr/share/texlive/texmf-dist/tex/latex/circuitikz/circuitikz.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/schemabloc/schemabloc.sty
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty)
 (/usr/share/texlive/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
 (/usr/share/texlive/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
 (/usr/share/texlive/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
@@ -145,60 +150,65 @@ tex)
 (/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
 zlibrarytopaths.code.tex)))
 (/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
-zlibrarycalc.code.tex)
+zlibraryshapes.code.tex
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibraryshapes.geometric.code.tex
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshape
+s.geometric.code.tex))
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibraryshapes.misc.code.tex
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshape
+s.misc.code.tex))
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibraryshapes.symbols.code.tex
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshape
+s.symbols.code.tex))
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibraryshapes.arrows.code.tex
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshape
+s.arrows.code.tex))
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibraryshapes.callouts.code.tex
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshape
+s.callouts.code.tex))
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibraryshapes.multipart.code.tex
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshape
+s.multipart.code.tex)))
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibraryarrows.code.tex
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/pgflibraryarrows.code.
+tex))
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibrarypositioning.code.tex)
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibraryfit.code.tex))
 (/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/pgflibraryarrows.meta.
 code.tex)
 (/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
-zlibrarybending.code.tex
-(/usr/share/texlive/texmf-dist/tex/generic/pgf/modules/pgfmodulebending.code.te
-x
-(/usr/share/texlive/texmf-dist/tex/generic/pgf/modules/pgfmodulenonlineartransf
-ormations.code.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/pgflibrarycurvilinear.
-code.tex)))
-(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
-zlibraryfpu.code.tex
-(/usr/share/texlive/texmf-dist/tex/generic/pgf/libraries/pgflibraryfpu.code.tex
-)) (/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcirc.defines.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircutils.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircpath.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircshapes.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircmonopoles.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircbipoles.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcirctripoles.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircquadpoles.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircmultipoles.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcirclabel.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircvoltage.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcirccurrent.tex)
-(/usr/share/texlive/texmf-dist/tex/generic/circuitikz/pgfcircflow.tex))
+zlibrarycalc.code.tex)
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(current/reconstruction.aux)
+(current-control/reconstruction.aux)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
-(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty)
-(/usr/share/texlive/texmf-dist/tex/latex/grfext/grfext.sty
-(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty))
-(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty
-(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
-(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty))
-(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty)
 (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
-[1
-Non-PDF special ignored!
-<special> papersize=356.67836pt,133.32414pt
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-(current/reconstruction.aux) )</usr/share/texlive/texmf-dist/fonts/type1/public
-/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.
-pfb>
-Output written on current/reconstruction.pdf (1 page, 41174 bytes).
-Transcript written on current/reconstruction.log.
-Latexmk: Getting log file 'current/reconstruction.log'
-Latexmk: Examining 'current/reconstruction.fls'
-Latexmk: Examining 'current/reconstruction.log'
-Latexmk: Log file says output to 'current/reconstruction.pdf'
-Latexmk: All targets (current/reconstruction.pdf) are up-to-date
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+(current-control/reconstruction.aux) )</usr/share/texlive/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmmi9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pf
+b></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/
+share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/te
+xlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texlive/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmsy9.pfb>
+Output written on current-control/reconstruction.pdf (1 page, 89124 bytes).
+Transcript written on current-control/reconstruction.log.
+Latexmk: Getting log file 'current-control/reconstruction.log'
+Latexmk: Examining 'current-control/reconstruction.fls'
+Latexmk: Examining 'current-control/reconstruction.log'
+Latexmk: Log file says output to 'current-control/reconstruction.pdf'
+Latexmk: All targets (current-control/reconstruction.pdf) are up-to-date
 

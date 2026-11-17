@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Schemabloc lint response",
+  "type": "object",
+  "required": ["success", "schema_version", "tool_version", "result"],
+  "properties": {
+    "success": { "type": "boolean" },
+    "schema_version": { "type": "integer" },
+    "tool_version": { "type": "string" },
+    "result": {
+      "type": "object",
+      "required": ["source_kind", "source_sha256", "checks", "counts", "summary"],
+      "properties": {
+        "source_kind": { "enum": ["path", "text"] },
+        "source_path": { "type": ["string", "null"] },
+        "source_sha256": { "type": "string" },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "status", "message", "line"],
+            "properties": {
+              "id": { "type": "string" },
+              "status": { "enum": ["passed", "warning", "failed"] },
+              "message": { "type": "string" },
+              "line": { "type": ["integer", "null"] },
+              "details": { "type": "object" }
+            }
+          }
+        },
+        "counts": {
+          "type": "object",
+          "required": ["blocks", "comparators", "links", "entries", "exits"],
+          "properties": {
+            "blocks": { "type": "integer" },
+            "comparators": { "type": "integer" },
+            "links": { "type": "integer" },
+            "entries": { "type": "integer" },
+            "exits": { "type": "integer" }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "required": ["passed", "warning", "failed"],
+          "properties": {
+            "passed": { "type": "integer" },
+            "warning": { "type": "integer" },
+            "failed": { "type": "integer" }
+          }
+        }
+      }
+    }
+  }
+}
