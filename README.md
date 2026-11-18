@@ -39,8 +39,9 @@ Copy the electrical diagram to reconstruct to:
 reference/target.png
 ```
 
-The target is intentionally absent from this archive because it is the input
-for a particular reconstruction task. See `reference/README.md`.
+`reference/target.png` and `reference/control_diagram.png` are the bundled
+inputs for the circuit and control profiles. Replace them with your own target
+for a new reconstruction. See `reference/README.md`.
 
 ## Configure models
 
@@ -239,9 +240,8 @@ calls with result sizes, and the final structured output. Tool result bodies and
 model-internal reasoning are not part of the record. Iteration folders that were
 archived before this layout existed were backfilled from the same source.
 
-The coordinating session's own transcript is saved at
-`session-transcript.md`, so the decisions that drove the loop stay
-readable after the session process is gone.
+A coordinating session writes its own transcript to `session-transcript.md`.
+It is per-run output, ignored by git, and not part of the template.
 
 ## Efficiency analysis (human-initiated)
 

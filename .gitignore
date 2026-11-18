@@ -1,6 +1,24 @@
-tmp/png-measure/
-tmp/dskt/
-tools/png-measure/mcp/.venv/
-tools/dskt/mcp/.venv/
-tools/dskt/mcp/**/__pycache__/
+# Reconstruction runtime state
+/current/
+/current-control/
+/iterations/
+/iterations-control/
+/logs/
+/tmp/
+/tools/dskt/mcp/tmp/
+/session-transcript.md
+
+# LaTeX intermediates
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.log
+
+# Python tooling
+**/__pycache__/
+**/.pytest_cache/
+**/.venv/
+
+# Pharo
 PharoDebug.log

@@ -1,2 +1,0 @@
-Latexmk: Missing input file 'standalone.cls' (or dependence on it) from following:
-  ! LaTeX Error: File `standalone.cls' not found.
